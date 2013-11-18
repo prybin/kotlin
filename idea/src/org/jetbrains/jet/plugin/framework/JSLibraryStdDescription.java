@@ -104,7 +104,9 @@ public class JSLibraryStdDescription extends CustomLibraryDescriptorWithDefferCo
 
         String copyJsFileIntoPath = dialog.getCopyJsIntoPath();
         if (!jsFilePresent && copyJsFileIntoPath != null) {
-            deferredCopyFileRequests.addCopyRequest(jsConfigurator.getJsFile(), copyJsFileIntoPath);
+            for (File file : jsConfigurator.getJsFiles()) {
+                deferredCopyFileRequests.addCopyRequest(file, copyJsFileIntoPath);
+            }
         }
 
         if (jarFilePresent) {

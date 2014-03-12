@@ -60,6 +60,10 @@ public class TopDownAnalyzer {
 
     static {
         LAZY = "true".equals(System.getProperty("lazy.tda"));
+        boolean printStatus = "true".equals(System.getProperty("tda.print.status"));
+        if (printStatus) {
+            System.out.println(LAZY ? "Lazy TDA" : "Eager TDA");
+        }
     }
 
     @NotNull

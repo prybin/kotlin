@@ -31,16 +31,17 @@ import java.util.*;
 import static org.jetbrains.jet.lang.resolve.LibrarySourceHacks.filterOutMembersFromLibrarySource;
 
 @SuppressWarnings("unchecked")
-public class CallableDescriptorCollectors<D extends CallableDescriptor> {
+public class CallableDescriptorCollectors<D extends CallableDescriptor> implements Iterable<CallableDescriptorCollector<D>> {
     private static final CallableDescriptorCollector<FunctionDescriptor> FUNCTIONS_COLLECTOR =
             new FilteredCollector<FunctionDescriptor>(new FunctionCollector());
     private static final CallableDescriptorCollector<VariableDescriptor> VARIABLES_COLLECTOR =
             new FilteredCollector<VariableDescriptor>(new VariableCollector());
     private static final CallableDescriptorCollector<VariableDescriptor> PROPERTIES_COLLECTOR =
             new FilteredCollector<VariableDescriptor>(new PropertyCollector());
+
     public static final CallableDescriptorCollectors<CallableDescriptor> FUNCTIONS_AND_VARIABLES =
             new CallableDescriptorCollectors(FUNCTIONS_COLLECTOR, VARIABLES_COLLECTOR);
-    public static final CallableDescriptorCollectors<FunctionDescriptor> FUNCTIONS =
+    public static final CallableDescriptorCollectors<CallableDescriptor> FUNCTIONS =
             new CallableDescriptorCollectors(FUNCTIONS_COLLECTOR);
     public static final CallableDescriptorCollectors<VariableDescriptor> VARIABLES =
             new CallableDescriptorCollectors(VARIABLES_COLLECTOR);
@@ -204,13 +205,15 @@ public class CallableDescriptorCollectors<D extends CallableDescriptor> {
         }
     }
 
-    private final Collection<CallableDescriptorCollector<? extends D>> collectors;
+    private final Collection<CallableDescriptorCollector<D>> collectors;
 
-    private CallableDescriptorCollectors(CallableDescriptorCollector<? extends D>... collectors) {
+    private CallableDescriptorCollectors(CallableDescriptorCollector<D>... collectors) {
         this.collectors = Lists.newArrayList(collectors);
     }
 
-    public Collection<CallableDescriptorCollector<? extends D>> getCollectors() {
-        return collectors;
+    @NotNull
+    @Override
+    public Iterator<CallableDescriptorCollector<D>> iterator() {
+        return collectors.iterator();
     }
 }

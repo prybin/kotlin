@@ -97,7 +97,7 @@ public class CallResolver {
         assert calleeExpression instanceof JetSimpleNameExpression;
         JetSimpleNameExpression nameExpression = (JetSimpleNameExpression) calleeExpression;
         Name referencedName = nameExpression.getReferencedNameAsName();
-        CallableDescriptorCollectors<? extends VariableDescriptor> callableDescriptorCollectors;
+        CallableDescriptorCollectors<VariableDescriptor> callableDescriptorCollectors;
         if (nameExpression.getReferencedNameElementType() == JetTokens.FIELD_IDENTIFIER) {
             referencedName = Name.identifier(referencedName.asString().substring(1));
             callableDescriptorCollectors = CallableDescriptorCollectors.PROPERTIES;
@@ -150,7 +150,7 @@ public class CallResolver {
             @NotNull BasicCallResolutionContext context,
             @NotNull Name name,
             @NotNull TracingStrategy tracing,
-            @NotNull CallableDescriptorCollectors<? extends CallableDescriptor> collectors
+            @NotNull CallableDescriptorCollectors<CallableDescriptor> collectors
     ) {
         List<ResolutionTask<CallableDescriptor, FunctionDescriptor>> tasks =
                 TaskPrioritizer.<CallableDescriptor, FunctionDescriptor>computePrioritizedTasks(context, name, tracing, collectors);

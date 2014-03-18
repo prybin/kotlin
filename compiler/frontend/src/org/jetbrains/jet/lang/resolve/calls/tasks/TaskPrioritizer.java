@@ -81,7 +81,7 @@ public class TaskPrioritizer {
             @NotNull BasicCallResolutionContext context,
             @NotNull Name name,
             @NotNull TracingStrategy tracing,
-            @NotNull List<CallableDescriptorCollector<? extends D>> callableDescriptorCollectors
+            @NotNull CallableDescriptorCollectors<? extends D> callableDescriptorCollectors
     ) {
         List<Pair<JetScope, ReceiverValue>> variants = new ArrayList<Pair<JetScope, ReceiverValue>>(2);
 
@@ -136,7 +136,7 @@ public class TaskPrioritizer {
         List<JetType> variantsForExplicitReceiver = AutoCastUtils.getAutoCastVariants(explicitReceiver, c.context);
 
         //members
-        for (CallableDescriptorCollector<? extends D> callableDescriptorCollector : c.callableDescriptorCollectors) {
+        for (CallableDescriptorCollector<? extends D> callableDescriptorCollector : c.callableDescriptorCollectors.getCollectors()) {
             Collection<ResolutionCandidate<D>> members = Lists.newArrayList();
             for (JetType type : variantsForExplicitReceiver) {
                 Collection<? extends D> membersForThisVariant =
@@ -147,7 +147,7 @@ public class TaskPrioritizer {
             c.result.addCandidates(members);
         }
 
-        for (CallableDescriptorCollector<? extends D> callableDescriptorCollector : c.callableDescriptorCollectors) {
+        for (CallableDescriptorCollector<? extends D> callableDescriptorCollector : c.callableDescriptorCollectors.getCollectors()) {
             //member extensions
             for (ReceiverValue implicitReceiver : implicitReceivers) {
                 addMemberExtensionCandidates(implicitReceiver, explicitReceiver,
@@ -184,7 +184,7 @@ public class TaskPrioritizer {
     ) {
         List<Collection<ResolutionCandidate<D>>> localsList = Lists.newArrayList();
         List<Collection<ResolutionCandidate<D>>> nonlocalsList = Lists.newArrayList();
-        for (CallableDescriptorCollector<? extends D> callableDescriptorCollector : c.callableDescriptorCollectors) {
+        for (CallableDescriptorCollector<? extends D> callableDescriptorCollector : c.callableDescriptorCollectors.getCollectors()) {
 
             Collection<ResolutionCandidate<D>> members = convertWithImpliedThisAndNoReceiver(
                     c.scope, callableDescriptorCollector.getNonExtensionsByName(c.scope, c.name, c.context.trace), c.context.call);
@@ -253,7 +253,7 @@ public class TaskPrioritizer {
             @NotNull TaskPrioritizerContext<D, F> c,
             @NotNull ExplicitReceiverKind receiverKind
     ) {
-        for (CallableDescriptorCollector<? extends D> callableDescriptorCollector : c.callableDescriptorCollectors) {
+        for (CallableDescriptorCollector<? extends D> callableDescriptorCollector : c.callableDescriptorCollectors.getCollectors()) {
             addMemberExtensionCandidates(thisObject, receiverParameter, callableDescriptorCollector, c, receiverKind);
         }
     }
@@ -383,14 +383,14 @@ public class TaskPrioritizer {
         @NotNull public final ResolutionTaskHolder<D, F> result;
         @NotNull public final BasicCallResolutionContext context;
         @NotNull public final JetScope scope;
-        @NotNull public final List<CallableDescriptorCollector<? extends D>> callableDescriptorCollectors;
+        @NotNull public final CallableDescriptorCollectors<? extends D> callableDescriptorCollectors;
 
         private TaskPrioritizerContext(
                 @NotNull Name name,
                 @NotNull ResolutionTaskHolder<D, F> result,
                 @NotNull BasicCallResolutionContext context,
                 @NotNull JetScope scope,
-                @NotNull List<CallableDescriptorCollector<? extends D>> callableDescriptorCollectors
+                @NotNull CallableDescriptorCollectors<? extends D> callableDescriptorCollectors
         ) {
             this.name = name;
             this.result = result;

@@ -100,6 +100,7 @@ import org.jetbrains.jet.cfg.AbstractDataFlowTest
 import org.jetbrains.jet.plugin.libraries.AbstractDecompiledTextTest
 import org.jetbrains.jet.plugin.imports.AbstractOptimizeImportsTest
 import org.jetbrains.jet.plugin.debugger.AbstractSmartStepIntoTest
+import org.jetbrains.jet.plugin.codeInsight.AbstractJetInspectionTest
 
 fun main(args: Array<String>) {
     System.setProperty("java.awt.headless", "true")
@@ -378,6 +379,10 @@ fun main(args: Array<String>) {
             model("intentions/attributeCallReplacements/replaceUnaryPrefixIntention", testMethod = "doTestReplaceUnaryPrefixIntention")
             model("intentions/attributeCallReplacements/replaceInvokeIntention", testMethod = "doTestReplaceInvokeIntention")
             model("intentions/simplifyNegatedBinaryExpressionIntention", testMethod = "doTestSimplifyNegatedBinaryExpressionIntention")
+        }
+
+        testClass(javaClass<AbstractJetInspectionTest>()) {
+            model("codeInsight/inspections", extension = null, recursive = false)
         }
 
         testClass(javaClass<AbstractHierarchyTest>()) {

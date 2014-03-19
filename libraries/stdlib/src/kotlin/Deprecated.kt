@@ -66,5 +66,8 @@ public fun <T> countTo(n: Int): (T) -> Boolean {
     return { ++count; count <= n }
 }
 
+deprecated("Use contains() function instead")
+public fun <T> Iterable<T>.containsItem(item : T) : Boolean = contains(item)
+
 deprecated("Use sortBy() instead")
 public fun <T> Iterable<T>.sort(comparator: java.util.Comparator<T>) : List<T> = sortBy(comparator)

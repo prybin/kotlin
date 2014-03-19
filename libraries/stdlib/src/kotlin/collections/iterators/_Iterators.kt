@@ -471,6 +471,14 @@ public fun <T> Iterator<T>.toSet() : Set<T> {
 }
 
 /**
+ * Copies all elements into a [[HashSet]]
+ */
+deprecated("Use streams for lazy collection operations.")
+public fun <T> Iterator<T>.toHashSet() : HashSet<T> {
+    return toCollection(HashSet<T>())
+}
+
+/**
  * Copies all elements into a [[SortedSet]]
  */
 deprecated("Use streams for lazy collection operations.")

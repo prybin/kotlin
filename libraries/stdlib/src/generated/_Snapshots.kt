@@ -233,6 +233,83 @@ public fun <T, C : MutableCollection<in T>> Stream<T>.toCollection(collection : 
 }
 
 /**
+ * Returns a HashSet of all elements
+ */
+public fun <T> Array<out T>.toHashSet() : HashSet<T> {
+    return toCollection(HashSet<T>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun BooleanArray.toHashSet() : HashSet<Boolean> {
+    return toCollection(HashSet<Boolean>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun ByteArray.toHashSet() : HashSet<Byte> {
+    return toCollection(HashSet<Byte>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun CharArray.toHashSet() : HashSet<Char> {
+    return toCollection(HashSet<Char>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun DoubleArray.toHashSet() : HashSet<Double> {
+    return toCollection(HashSet<Double>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun FloatArray.toHashSet() : HashSet<Float> {
+    return toCollection(HashSet<Float>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun IntArray.toHashSet() : HashSet<Int> {
+    return toCollection(HashSet<Int>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun LongArray.toHashSet() : HashSet<Long> {
+    return toCollection(HashSet<Long>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun ShortArray.toHashSet() : HashSet<Short> {
+    return toCollection(HashSet<Short>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun <T> Iterable<T>.toHashSet() : HashSet<T> {
+    return toCollection(HashSet<T>())
+}
+
+/**
+ * Returns a HashSet of all elements
+ */
+public fun <T> Stream<T>.toHashSet() : HashSet<T> {
+    return toCollection(HashSet<T>())
+}
+
+/**
  * Returns a LinkedList containing all elements
  */
 public fun <T> Array<out T>.toLinkedList() : LinkedList<T> {

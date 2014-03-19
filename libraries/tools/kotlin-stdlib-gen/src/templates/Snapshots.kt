@@ -25,6 +25,12 @@ fun snapshots(): List<GenericFunction> {
         body { "return toCollection(LinkedHashSet<T>())" }
     }
 
+    templates add f("toHashSet()") {
+        doc { "Returns a HashSet of all elements" }
+        returns("HashSet<T>")
+        body { "return toCollection(HashSet<T>())" }
+    }
+
     templates add f("toSortedSet()") {
         doc { "Returns a SortedSet of all elements" }
         returns("SortedSet<T>")

@@ -219,6 +219,7 @@
                 <include name="**/*.kt" />
                 <!-- JVM specific -->
                 <exclude name="**/*JVM.kt" />
+                <exclude name="kotlin/jvm/**" />
                 <exclude name="kotlin/beans/**" />
                 <exclude name="kotlin/browser/**" />
                 <exclude name="kotlin/concurrent/**" />
@@ -243,7 +244,7 @@
             </fileset>
         </path>
 
-        <kotlin2js srcRef="js.lib" output="${basedir}/js/js.translator/testFiles/kotlin_lib_compiled.js" main="noCall" />
+        <kotlin2js srcRef="js.lib" output="${basedir}/js/js.translator/testData/kotlin_lib_compiled.js" main="noCall" />
 
         <jar jarfile="${kotlin-home}/lib/kotlin-jslib.jar">
             <path refid="js.lib" />

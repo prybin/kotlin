@@ -229,28 +229,26 @@ public class MethodInliner {
         node.instructions.resetLabels();
         MethodNode transformedNode = new MethodNode(node.access, node.name, Type.getMethodDescriptor(returnType, allTypes), node.signature, null) {
 
-            private final boolean keepLineNumbers = nodeRemapper.isInsideInliningLambda();
+            private final boolean isInliningLambda = nodeRemapper.isInsideInliningLambda();
 
-            @Override
-            public void visitVarInsn(int opcode, int var) {
+            private int getNewIndex(int var) {
                 int newIndex;
                 if (var < realParametersSize) {
                     newIndex = var;
                 } else {
                     newIndex = var + capturedParamsSize;
                 }
-                super.visitVarInsn(opcode, newIndex);
+                return newIndex;
+            }
+
+            @Override
+            public void visitVarInsn(int opcode, int var) {
+                super.visitVarInsn(opcode, getNewIndex(var));
             }
 
             @Override
             public void visitIincInsn(int var, int increment) {
-                int newIndex;
-                if (var < realParametersSize) {
-                    newIndex = var;
-                } else {
-                    newIndex = var + capturedParamsSize;
-                }
-                super.visitIincInsn(newIndex, increment);
+                super.visitIincInsn(getNewIndex(var), increment);
             }
 
             @Override
@@ -260,8 +258,17 @@ public class MethodInliner {
 
             @Override
             public void visitLineNumber(int line, Label start) {
-                if(keepLineNumbers) {
+                if(isInliningLambda) {
                     super.visitLineNumber(line, start);
+                }
+            }
+
+            @Override
+            public void visitLocalVariable(
+                    String name, String desc, String signature, Label start, Label end, int index
+            ) {
+                if (isInliningLambda) {
+                    super.visitLocalVariable(name, desc, signature, start, end, getNewIndex(index));
                 }
             }
         };

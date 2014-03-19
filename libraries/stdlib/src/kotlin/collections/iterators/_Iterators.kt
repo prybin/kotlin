@@ -455,6 +455,14 @@ public fun <T> Iterator<T>.toList() : List<T> {
 }
 
 /**
+ * Copies all elements into a [[ArrayList]]
+ */
+deprecated("Use streams for lazy collection operations.")
+public fun <T> Iterator<T>.toArrayList() : ArrayList<T> {
+    return toCollection(ArrayList<T>())
+}
+
+/**
  * Copies all elements into a [[Set]]
  */
 deprecated("Use streams for lazy collection operations.")

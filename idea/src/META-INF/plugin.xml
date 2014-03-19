@@ -611,6 +611,12 @@
     <category>Kotlin</category>
     </intentionAction>
 
+    <localInspection implementationClass="org.jetbrains.jet.plugin.inspections.ExplicitGetInspection"
+        displayName="Explicit 'get'"
+        groupName="Kotlin"
+        enabledByDefault="true"
+        level="WARNING"
+        />
 
     <project.converterProvider implementation="org.jetbrains.jet.plugin.converters.JetRunConfigurationSettingsFormatConverterProvider"/>
 

@@ -211,6 +211,9 @@ public inline fun <T> Reader.useLines(block: (Stream<String>) -> T): T =
  */
 public fun BufferedReader.lines(): Stream<String> = LinesStream(this)
 
+deprecated("Use lines() function which returns Stream<String>")
+public fun BufferedReader.lineIterator(): Iterator<String> = lines().iterator()
+
 class LinesStream(val reader: BufferedReader) : Stream<String> {
     override fun iterator(): Iterator<String> {
         return object : Iterator<String> {

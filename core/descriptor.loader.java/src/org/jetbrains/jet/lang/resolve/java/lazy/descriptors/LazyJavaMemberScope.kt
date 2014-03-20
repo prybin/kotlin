@@ -35,6 +35,7 @@ import org.jetbrains.jet.lang.resolve.java.sam.SingleAbstractMethodUtils
 import org.jetbrains.jet.utils.Printer
 import org.jetbrains.jet.lang.resolve.java.descriptor.JavaPackageFragmentDescriptor
 import org.jetbrains.jet.lang.resolve.java.structure.JavaPropertyInitializerEvaluator
+import org.jetbrains.jet.utils.*
 
 public abstract class LazyJavaMemberScope(
         protected val c: LazyJavaResolverContextWithTypes,
@@ -125,7 +126,8 @@ public abstract class LazyJavaMemberScope(
         val effectiveSignature: ExternalSignatureResolver.AlternativeMethodSignature
         if (_containingDeclaration is PackageFragmentDescriptor) {
             superFunctions = Collections.emptyList()
-            effectiveSignature = c.externalSignatureResolver.resolveAlternativeMethodSignature(method, false, returnType, null, valueParameters, methodTypeParameters)
+            effectiveSignature = c.externalSignatureResolver.resolveAlternativeMethodSignature(method, false, returnType, null, valueParameters,
+                                                                                               methodTypeParameters, false)
             signatureErrors = effectiveSignature.getErrors()
         }
         else if (_containingDeclaration is ClassDescriptor) {
@@ -133,7 +135,8 @@ public abstract class LazyJavaMemberScope(
             superFunctions = propagated.getSuperMethods()
             effectiveSignature = c.externalSignatureResolver.resolveAlternativeMethodSignature(
                     method, !superFunctions.isEmpty(), propagated.getReturnType(),
-                    propagated.getReceiverType(), propagated.getValueParameters(), propagated.getTypeParameters())
+                    propagated.getReceiverType(), propagated.getValueParameters(), propagated.getTypeParameters(),
+                    propagated.hasStableParameterNames())
 
             signatureErrors = ArrayList<String>(propagated.getErrors())
             signatureErrors.addAll(effectiveSignature.getErrors())
@@ -152,6 +155,8 @@ public abstract class LazyJavaMemberScope(
                 method.getVisibility()
         )
 
+        functionDescriptorImpl.setHasStableParameterNames(effectiveSignature.hasStableParameterNames())
+
         if (record) {
             c.javaResolverCache.recordMethod(method, functionDescriptorImpl)
         }
@@ -166,7 +171,7 @@ public abstract class LazyJavaMemberScope(
             function: FunctionDescriptor,
             jValueParameters: List<JavaValueParameter>
     ): List<ValueParameterDescriptor> {
-        return jValueParameters.withIndices().map {
+        return jValueParameters.withIndices_tmp().map_tmp {
             pair ->
             val (index, javaParameter) = pair
 

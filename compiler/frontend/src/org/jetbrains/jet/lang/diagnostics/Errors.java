@@ -321,6 +321,7 @@ public interface Errors {
     DiagnosticFactory0<JetReferenceExpression> ARGUMENT_PASSED_TWICE = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory1<JetReferenceExpression, JetReferenceExpression> NAMED_PARAMETER_NOT_FOUND =
             DiagnosticFactory1.create(ERROR, FOR_UNRESOLVED_REFERENCE);
+    DiagnosticFactory0<PsiElement> NAMED_ARGUMENTS_NOT_ALLOWED = DiagnosticFactory0.create(ERROR);
 
     DiagnosticFactory0<JetExpression> VARARG_OUTSIDE_PARENTHESES = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<LeafPsiElement> NON_VARARG_SPREAD = DiagnosticFactory0.create(ERROR);
@@ -331,15 +332,14 @@ public interface Errors {
 
     DiagnosticFactory1<JetElement, ValueParameterDescriptor> NO_VALUE_FOR_PARAMETER = DiagnosticFactory1.create(ERROR, VALUE_ARGUMENTS);
 
-    DiagnosticFactory1<JetReferenceExpression, JetType> MISSING_RECEIVER = DiagnosticFactory1.create(ERROR);
-    DiagnosticFactory0<JetReferenceExpression> NO_RECEIVER_ADMITTED = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory1<JetExpression, JetType> MISSING_RECEIVER = DiagnosticFactory1.create(ERROR);
+    DiagnosticFactory0<JetExpression> NO_RECEIVER_ADMITTED = DiagnosticFactory0.create(ERROR);
 
     // Call resolution
 
     DiagnosticFactory1<JetExpression, String> ILLEGAL_SELECTOR = DiagnosticFactory1.create(ERROR);
 
-    DiagnosticFactory1<JetExpression, JetType> CALLEE_NOT_A_FUNCTION = DiagnosticFactory1.create(ERROR);
-    DiagnosticFactory2<JetReferenceExpression, JetExpression, JetType> FUNCTION_EXPECTED = DiagnosticFactory2.create(ERROR);
+    DiagnosticFactory2<JetExpression, JetExpression, JetType> FUNCTION_EXPECTED = DiagnosticFactory2.create(ERROR);
     DiagnosticFactory2<JetExpression, JetExpression, Boolean> FUNCTION_CALL_EXPECTED = DiagnosticFactory2.create(ERROR, CALL_EXPRESSION);
 
     DiagnosticFactory0<PsiElement> NON_TAIL_RECURSIVE_CALL = DiagnosticFactory0.create(WARNING, CALL_EXPRESSION);
@@ -469,7 +469,7 @@ public interface Errors {
     // Nullability
 
     DiagnosticFactory1<PsiElement, JetType> UNSAFE_CALL = DiagnosticFactory1.create(ERROR);
-    DiagnosticFactory3<JetReferenceExpression, String, String, String> UNSAFE_INFIX_CALL = DiagnosticFactory3.create(ERROR);
+    DiagnosticFactory3<JetExpression, String, String, String> UNSAFE_INFIX_CALL = DiagnosticFactory3.create(ERROR);
     DiagnosticFactory1<PsiElement, JetType> UNNECESSARY_SAFE_CALL = DiagnosticFactory1.create(WARNING);
     DiagnosticFactory1<PsiElement, JetType> UNNECESSARY_NOT_NULL_ASSERTION = DiagnosticFactory1.create(WARNING);
 

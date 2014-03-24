@@ -1,0 +1,6 @@
+fun main(args: Array<String>) {
+    val value = hashMap("one" to 1,
+                "two" to null,
+                "three" to 3).get("one")
+    if (value != null) value else throw NullPointerException("Expression 'hashMap(\"one\" to 1, \"two\" to null, \"three\" to 3).get(\"one\")' must not be null")
+}

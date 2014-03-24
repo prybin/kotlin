@@ -336,6 +336,7 @@ fun main(args: Array<String>) {
         }
 
         testClass(javaClass<AbstractCodeTransformationTest>()) {
+            model("intentions/branched/doubleBangToIfThen", testMethod = "doTestDoubleBangToIfThen")
             model("intentions/branched/elvisToIfThen", testMethod = "doTestElvisToIfThen")
             model("intentions/branched/ifThenToElvis", testMethod = "doTestIfThenToElvis")
             model("intentions/branched/safeAccessToIfThen", testMethod = "doTestSafeAccessToIfThen")

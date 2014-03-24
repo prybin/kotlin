@@ -38,6 +38,8 @@ import org.jetbrains.jet.lang.descriptors.VariableDescriptor
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.search.LocalSearchScope
 import org.jetbrains.jet.lang.psi.JetDeclaration
+import org.jetbrains.jet.lang.psi.JetThrowExpression
+import org.jetbrains.jet.lang.psi.JetPostfixExpression
 
 fun JetBinaryExpression.comparesNonNullToNull(): Boolean {
     val operationToken = this.getOperationToken()
@@ -87,6 +89,8 @@ fun JetExpression.isNullExpression(): Boolean = this.extractExpressionIfSingle()
 
 fun JetExpression.isNullExpressionOrEmptyBlock(): Boolean = this.isNullExpression() || this is JetBlockExpression && this.getStatements().empty
 
+fun JetExpression.isThrowExpression(): Boolean = this.extractExpressionIfSingle() is JetThrowExpression
+
 fun JetExpression.isNotNullExpression(): Boolean {
     val innerExpression = this.extractExpressionIfSingle()
     return innerExpression != null && innerExpression.getText() != "null"
@@ -134,6 +138,10 @@ fun JetSafeQualifiedExpression.inlineReceiverIfApplicableWithPrompt(editor: Edit
 
 fun JetBinaryExpression.inlineLeftSideIfApplicableWithPrompt(editor: Editor) {
     (this.getLeft() as? JetSimpleNameExpression)?.inlineIfDeclaredLocallyAndOnlyUsedOnceWithPrompt(editor)
+}
+
+fun JetPostfixExpression.inlineBaseExpressionIfApplicableWithPrompt(editor: Editor) {
+    (this.getBaseExpression() as? JetSimpleNameExpression)?.inlineIfDeclaredLocallyAndOnlyUsedOnceWithPrompt(editor)
 }
 
 fun JetExpression.isStableVariable(): Boolean {

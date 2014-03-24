@@ -17,29 +17,24 @@
 package org.jetbrains.jet.lang.resolve.lazy.declarations;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.*;
-import com.intellij.psi.NavigatablePsiElement;
-import com.intellij.util.Function;
-import com.intellij.util.containers.ContainerUtil;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import kotlin.Function0;
-import kotlin.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.psi.JetPackageDirective;
-import org.jetbrains.jet.lang.psi.JetPsiUtil;
 import org.jetbrains.jet.lang.resolve.lazy.data.JetClassLikeInfo;
 import org.jetbrains.jet.lang.resolve.name.FqName;
-import org.jetbrains.jet.storage.MemoizedFunctionToNullable;
 import org.jetbrains.jet.storage.NotNullLazyValue;
 import org.jetbrains.jet.storage.StorageManager;
-import org.jetbrains.jet.lang.resolve.name.NamePackage;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
-public class FileBasedDeclarationProviderFactory implements DeclarationProviderFactory {
+public class FileBasedDeclarationProviderFactory extends AbstractDeclarationProviderFactory  {
 
     private static class Index {
         private final Multimap<FqName, JetFile> filesByPackage = HashMultimap.create();
@@ -49,20 +44,13 @@ public class FileBasedDeclarationProviderFactory implements DeclarationProviderF
     private final StorageManager storageManager;
     private final NotNullLazyValue<Index> index;
 
-    private final MemoizedFunctionToNullable<FqName, PackageMemberDeclarationProvider> packageDeclarationProviders;
-
     public FileBasedDeclarationProviderFactory(@NotNull StorageManager storageManager, @NotNull final Collection<JetFile> files) {
+        super(storageManager);
         this.storageManager = storageManager;
         this.index = storageManager.createLazyValue(new Function0<Index>() {
             @Override
             public Index invoke() {
                 return computeFilesByPackage(files);
-            }
-        });
-        this.packageDeclarationProviders = storageManager.createMemoizedFunctionWithNullableValues(new Function1<FqName, PackageMemberDeclarationProvider>() {
-            @Override
-            public PackageMemberDeclarationProvider invoke(FqName fqName) {
-                return createPackageMemberDeclarationProvider(fqName);
             }
         });
     }
@@ -71,12 +59,7 @@ public class FileBasedDeclarationProviderFactory implements DeclarationProviderF
     private static Index computeFilesByPackage(@NotNull Collection<JetFile> files) {
         Index index = new Index();
         for (JetFile file : files) {
-            JetPackageDirective directive = file.getPackageDirective();
-            if (directive == null) {
-                throw new IllegalArgumentException("Scripts are not supported");
-            }
-
-            FqName packageFqName = new FqName(directive.getQualifiedName());
+            FqName packageFqName = file.getPackageFqName();
             addMeAndParentPackages(index, packageFqName);
             index.filesByPackage.put(packageFqName, file);
         }
@@ -103,34 +86,9 @@ public class FileBasedDeclarationProviderFactory implements DeclarationProviderF
         });
     }
 
-    /*package*/ Collection<NavigatablePsiElement> getPackageDeclarations(@NotNull final FqName fqName) {
-        if (fqName.isRoot()) {
-            return Collections.emptyList();
-        }
-
-        Collection<NavigatablePsiElement> resultElements = Lists.newArrayList();
-        for (FqName declaredPackage : index.invoke().filesByPackage.keys()) {
-            if (NamePackage.isSubpackageOf(declaredPackage, fqName)) {
-                Collection<JetFile> files = index.invoke().filesByPackage.get(declaredPackage);
-                resultElements.addAll(ContainerUtil.map(files, new Function<JetFile, NavigatablePsiElement>() {
-                    @Override
-                    public NavigatablePsiElement fun(JetFile file) {
-                        return JetPsiUtil.getPackageReference(file, NamePackage.numberOfSegments(fqName) - 1);
-                    }
-                }));
-            }
-        }
-
-        return resultElements;
-    }
-
-    @Override
-    public PackageMemberDeclarationProvider getPackageMemberDeclarationProvider(@NotNull FqName packageFqName) {
-        return packageDeclarationProviders.invoke(packageFqName);
-    }
-
     @Nullable
-    public PackageMemberDeclarationProvider createPackageMemberDeclarationProvider(@NotNull FqName packageFqName) {
+    @Override
+    protected PackageMemberDeclarationProvider createPackageMemberDeclarationProvider(@NotNull FqName packageFqName) {
         if (isPackageDeclaredExplicitly(packageFqName)) {
             return new FileBasedPackageMemberDeclarationProvider(
                     storageManager, packageFqName, this, index.invoke().filesByPackage.get(packageFqName));

@@ -16,7 +16,6 @@
 
 package org.jetbrains.jet.lang.resolve.lazy.declarations;
 
-import com.intellij.psi.NavigatablePsiElement;
 import kotlin.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.psi.JetDeclaration;
@@ -32,7 +31,7 @@ public class FileBasedPackageMemberDeclarationProvider extends AbstractPsiBasedD
     private final FqName fqName;
     private final FileBasedDeclarationProviderFactory factory;
     private final Collection<JetFile> packageFiles;
-    private final NotNullLazyValue<Collection<FqName>> allDeclaredPackages;
+    private final NotNullLazyValue<Collection<FqName>> allDeclaredSubPackages;
 
 
     /*package*/ FileBasedPackageMemberDeclarationProvider(
@@ -45,7 +44,7 @@ public class FileBasedPackageMemberDeclarationProvider extends AbstractPsiBasedD
         this.fqName = _fqName;
         this.factory = _factory;
         this.packageFiles = packageFiles;
-        this.allDeclaredPackages = storageManager.createLazyValue(new Function0<Collection<FqName>>() {
+        this.allDeclaredSubPackages = storageManager.createLazyValue(new Function0<Collection<FqName>>() {
             @Override
             public Collection<FqName> invoke() {
                 return factory.getAllDeclaredSubPackagesOf(fqName);
@@ -57,21 +56,16 @@ public class FileBasedPackageMemberDeclarationProvider extends AbstractPsiBasedD
     protected void doCreateIndex(@NotNull Index index) {
         for (JetFile file : packageFiles) {
             for (JetDeclaration declaration : file.getDeclarations()) {
-                assert fqName.asString().equals(file.getPackageName()) : "Files declaration utils contains file with invalid package";
+                assert fqName.equals(file.getPackageFqName()) : "Files declaration utils contains file with invalid package";
                 index.putToIndex(declaration);
             }
         }
     }
 
-    @Override
-    public Collection<FqName> getAllDeclaredPackages() {
-        return allDeclaredPackages.invoke();
-    }
-
     @NotNull
     @Override
-    public Collection<NavigatablePsiElement> getPackageDeclarations(FqName fqName) {
-        return factory.getPackageDeclarations(fqName);
+    public Collection<FqName> getAllDeclaredSubPackages() {
+        return allDeclaredSubPackages.invoke();
     }
 
     @NotNull

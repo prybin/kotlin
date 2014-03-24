@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+// SCRIPT: Resolve declarations in scripts
 public class ScriptHeaderResolver {
 
     public static final Key<Integer> PRIORITY_KEY = Key.create(JetScript.class.getName() + ".priority");
@@ -104,8 +105,7 @@ public class ScriptHeaderResolver {
 
     public void processScriptHierarchy(@NotNull TopDownAnalysisContext c, @NotNull JetScript script, @NotNull JetScope outerScope) {
         JetFile file = (JetFile) script.getContainingFile();
-        JetPackageDirective packageDirective = file.getPackageDirective();
-        FqName fqName = packageDirective != null ? new FqName(packageDirective.getQualifiedName()) : FqName.ROOT;
+        FqName fqName = file.getPackageFqName();
         PackageFragmentDescriptor ns = packageFragmentProvider.getOrCreateFragment(fqName);
 
         Integer priority = script.getUserData(PRIORITY_KEY);
@@ -113,7 +113,8 @@ public class ScriptHeaderResolver {
             priority = 0;
         }
 
-        Name className = new FqName(ScriptNameUtil.classNameForScript((JetFile) script.getContainingFile()).replace('/', '.')).shortName();
+        FqName nameForScript = ScriptNameUtil.classNameForScript((JetFile) script.getContainingFile());
+        Name className = nameForScript.shortName();
         ScriptDescriptor scriptDescriptor = new ScriptDescriptor(ns, priority, outerScope, className);
 
         //WriteThroughScope scriptScope = new WriteThroughScope(

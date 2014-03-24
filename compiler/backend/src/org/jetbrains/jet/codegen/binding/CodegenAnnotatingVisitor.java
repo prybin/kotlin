@@ -141,6 +141,7 @@ class CodegenAnnotatingVisitor extends JetVisitorVoid {
     @Override
     public void visitJetFile(@NotNull JetFile file) {
         if (file.isScript()) {
+            // SCRIPT: should be replaced with VisitScript override
             //noinspection ConstantConditions
             ClassDescriptor classDescriptor = bindingContext.get(CLASS_FOR_SCRIPT, bindingContext.get(SCRIPT, file.getScript()));
             pushClassDescriptor(classDescriptor);
@@ -148,7 +149,7 @@ class CodegenAnnotatingVisitor extends JetVisitorVoid {
             nameStack.push(asmTypeForScriptPsi(bindingContext, file.getScript()).getInternalName());
         }
         else {
-            nameStack.push(JvmClassName.byFqNameWithoutInnerClasses(JetPsiUtil.getFQName(file)).getInternalName());
+            nameStack.push(JvmClassName.byFqNameWithoutInnerClasses(file.getPackageFqName()).getInternalName());
         }
         file.acceptChildren(this);
         nameStack.pop();

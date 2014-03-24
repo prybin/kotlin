@@ -16,7 +16,6 @@
 
 package org.jetbrains.jet.lang.resolve.lazy.declarations;
 
-import com.intellij.psi.NavigatablePsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.ReadOnly;
 import org.jetbrains.jet.lang.psi.JetFile;
@@ -26,12 +25,11 @@ import java.util.Collection;
 
 public interface PackageMemberDeclarationProvider extends DeclarationProvider {
 
-    Collection<FqName> getAllDeclaredPackages();
-
-    @NotNull
-    Collection<NavigatablePsiElement> getPackageDeclarations(FqName fqName);
-
-    @NotNull
     @ReadOnly
+    @NotNull
+    Collection<FqName> getAllDeclaredSubPackages();
+
+    @ReadOnly
+    @NotNull
     Collection<JetFile> getPackageFiles();
 }

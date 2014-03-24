@@ -42,7 +42,6 @@ import org.jetbrains.jet.config.CommonConfigurationKeys;
 import org.jetbrains.jet.config.CompilerConfiguration;
 import org.jetbrains.jet.lang.descriptors.ModuleDescriptorImpl;
 import org.jetbrains.jet.lang.psi.JetFile;
-import org.jetbrains.jet.lang.psi.JetPsiUtil;
 import org.jetbrains.jet.lang.resolve.BindingTrace;
 import org.jetbrains.jet.lang.resolve.ScriptNameUtil;
 import org.jetbrains.jet.lang.resolve.java.AnalyzerFacadeForJVM;
@@ -170,7 +169,7 @@ public class KotlinToJVMBytecodeCompiler {
                     // more than one main
                     return null;
                 }
-                FqName fqName = JetPsiUtil.getFQName(file);
+                FqName fqName = file.getPackageFqName();
                 mainClass = PackageClassUtils.getPackageClassFqName(fqName);
             }
         }
@@ -227,7 +226,7 @@ public class KotlinToJVMBytecodeCompiler {
             return null;
         }
 
-        GeneratedClassLoader classLoader = null;
+        GeneratedClassLoader classLoader;
         try {
             classLoader = new GeneratedClassLoader(state.getFactory(),
                                                    new URLClassLoader(new URL[] {
@@ -236,16 +235,11 @@ public class KotlinToJVMBytecodeCompiler {
                                                    }, AllModules.class.getClassLoader())
             );
 
-            return classLoader.loadClass(ScriptNameUtil.classNameForScript(environment.getSourceFiles().get(0)));
+            FqName nameForScript = ScriptNameUtil.classNameForScript(environment.getSourceFiles().get(0));
+            return classLoader.loadClass(nameForScript.asString());
         }
         catch (Exception e) {
             throw new RuntimeException("Failed to evaluate script: " + e, e);
-        }
-        finally {
-            if (classLoader != null) {
-                classLoader.dispose();
-            }
-            state.destroy();
         }
     }
 

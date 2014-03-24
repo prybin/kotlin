@@ -28,6 +28,7 @@ import org.jetbrains.jet.lang.resolve.*;
 import org.jetbrains.jet.lang.resolve.calls.autocasts.DataFlowInfo;
 import org.jetbrains.jet.lang.resolve.calls.context.*;
 import org.jetbrains.jet.lang.resolve.calls.model.MutableDataFlowInfoForArguments;
+import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCall;
 import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCallImpl;
 import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCallWithTrace;
 import org.jetbrains.jet.lang.resolve.calls.results.OverloadResolutionResults;
@@ -53,7 +54,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.jetbrains.jet.lang.diagnostics.Errors.*;
+import static org.jetbrains.jet.lang.diagnostics.Errors.NOT_A_CLASS;
+import static org.jetbrains.jet.lang.diagnostics.Errors.NO_CONSTRUCTOR;
 import static org.jetbrains.jet.lang.resolve.BindingContext.NON_DEFAULT_EXPRESSION_DATA_FLOW;
 import static org.jetbrains.jet.lang.resolve.BindingContext.RESOLUTION_SCOPE;
 import static org.jetbrains.jet.lang.resolve.calls.CallResolverUtil.ResolveArgumentsMode.RESOLVE_FUNCTION_ARGUMENTS;
@@ -182,14 +184,15 @@ public class CallResolver {
             @NotNull DataFlowInfo dataFlowInfo,
             boolean isAnnotationContext
     ) {
-        return resolveFunctionCall(BasicCallResolutionContext.create(
-                trace, scope, call, expectedType, dataFlowInfo, ContextDependency.INDEPENDENT, CheckValueArgumentsMode.ENABLED,
-                ResolutionResultsCacheImpl.create(), LabelResolver.create(), null,
-                expressionTypingServices.createExtension(scope, isAnnotationContext), isAnnotationContext));
+        return resolveFunctionCall(
+                BasicCallResolutionContext.create(
+                        trace, scope, call, expectedType, dataFlowInfo, ContextDependency.INDEPENDENT, CheckValueArgumentsMode.ENABLED,
+                        expressionTypingServices.createExtension(scope, isAnnotationContext), isAnnotationContext)
+        );
     }
 
     @NotNull
-    /*package*/ OverloadResolutionResultsImpl<FunctionDescriptor> resolveFunctionCall(@NotNull BasicCallResolutionContext context) {
+    public OverloadResolutionResults<FunctionDescriptor> resolveFunctionCall(@NotNull BasicCallResolutionContext context) {
 
         ProgressIndicatorProvider.checkCanceled();
 
@@ -288,11 +291,9 @@ public class CallResolver {
                 Call call = new CallTransformer.CallForImplicitInvoke(
                         context.call.getExplicitReceiver(), expressionReceiver, context.call);
                 TracingStrategyForInvoke tracingForInvoke = new TracingStrategyForInvoke(calleeExpression, call, calleeType);
-                return (OverloadResolutionResultsImpl<FunctionDescriptor>)
-                        resolveCallForInvoke(context.replaceCall(call), tracingForInvoke);
+                return resolveCallForInvoke(context.replaceCall(call), tracingForInvoke);
             }
             else {
-//                checkTypesWithNoCallee(trace, scope, call);
                 return checkArgumentTypesAndFail(context);
             }
         }
@@ -345,7 +346,7 @@ public class CallResolver {
         }
         if (results == null) {
             BasicCallResolutionContext newContext = context.replaceBindingTrace(traceToResolveCall);
-            results = doResolveCall(newContext, prioritizedTasks, callTransformer, tracing);
+            results = doResolveCallAndRecordDebugInfo(newContext, prioritizedTasks, callTransformer, tracing);
             DelegatingBindingTrace deltasTraceForTypeInference = ((OverloadResolutionResultsImpl) results).getTrace();
             if (deltasTraceForTypeInference != null) {
                 deltasTraceForTypeInference.addAllMyDataTo(traceToResolveCall);
@@ -459,7 +460,7 @@ public class CallResolver {
     }
 
     @NotNull
-    private <D extends CallableDescriptor, F extends D> OverloadResolutionResultsImpl<F> doResolveCall(
+    private <D extends CallableDescriptor, F extends D> OverloadResolutionResultsImpl<F> doResolveCallAndRecordDebugInfo(
             @NotNull BasicCallResolutionContext context,
             @NotNull List<ResolutionTask<D, F>> prioritizedTasks, // high to low priority
             @NotNull CallTransformer<D, F> callTransformer,
@@ -477,48 +478,70 @@ public class CallResolver {
 
         debugInfo.set(ResolutionDebugInfo.TASKS, prioritizedTasks);
 
+        OverloadResolutionResultsImpl<F> results = doResolveCall(context, prioritizedTasks, callTransformer, tracing);
+        if (results.isSingleResult()) {
+            debugInfo.set(ResolutionDebugInfo.RESULT, results.getResultingCall());
+        }
+        return results;
+    }
+
+    @NotNull
+    private <D extends CallableDescriptor, F extends D> OverloadResolutionResultsImpl<F> doResolveCall(
+            @NotNull BasicCallResolutionContext context,
+            @NotNull List<ResolutionTask<D, F>> prioritizedTasks, // high to low priority
+            @NotNull CallTransformer<D, F> callTransformer,
+            @NotNull TracingStrategy tracing
+    ) {
         if (context.checkArguments == CheckValueArgumentsMode.ENABLED) {
             argumentTypeResolver.analyzeArgumentsAndRecordTypes(context);
         }
-
+        Collection<ResolvedCall<F>> allCandidates = Lists.newArrayList();
+        OverloadResolutionResultsImpl<F> successfulResults = null;
         TemporaryBindingTrace traceForFirstNonemptyCandidateSet = null;
         OverloadResolutionResultsImpl<F> resultsForFirstNonemptyCandidateSet = null;
         for (ResolutionTask<D, F> task : prioritizedTasks) {
-            TemporaryBindingTrace taskTrace = TemporaryBindingTrace.create(context.trace, "trace to resolve a task for", task.call.getCalleeExpression());
+            if (successfulResults != null && !context.collectAllCandidates) continue;
+
+            TemporaryBindingTrace taskTrace =
+                    TemporaryBindingTrace.create(context.trace, "trace to resolve a task for", task.call.getCalleeExpression());
             OverloadResolutionResultsImpl<F> results = performResolutionGuardedForExtraFunctionLiteralArguments(
                     task.replaceBindingTrace(taskTrace), callTransformer);
+
+            allCandidates.addAll(task.getResolvedCalls());
+
+            if (successfulResults != null) continue;
+
             if (results.isSuccess() || results.isAmbiguity()) {
                 taskTrace.commit();
-
-                if (results.isSuccess()) {
-                    debugInfo.set(ResolutionDebugInfo.RESULT, results.getResultingCall());
-                }
-                return results;
+                successfulResults = results;
             }
             if (results.getResultCode() == INCOMPLETE_TYPE_INFERENCE) {
                 results.setTrace(taskTrace);
-                return results;
+                successfulResults = results;
             }
             boolean updateResults = traceForFirstNonemptyCandidateSet == null
-                        || (resultsForFirstNonemptyCandidateSet.getResultCode() == CANDIDATES_WITH_WRONG_RECEIVER &&
-                            results.getResultCode() != CANDIDATES_WITH_WRONG_RECEIVER);
+                                    || (resultsForFirstNonemptyCandidateSet.getResultCode() == CANDIDATES_WITH_WRONG_RECEIVER
+                                        && results.getResultCode() != CANDIDATES_WITH_WRONG_RECEIVER);
             if (!task.getCandidates().isEmpty() && !results.isNothing() && updateResults) {
                 traceForFirstNonemptyCandidateSet = taskTrace;
                 resultsForFirstNonemptyCandidateSet = results;
             }
         }
-        if (traceForFirstNonemptyCandidateSet != null) {
-            traceForFirstNonemptyCandidateSet.commit();
-            if (resultsForFirstNonemptyCandidateSet.isSingleResult()) {
-
-                debugInfo.set(ResolutionDebugInfo.RESULT, resultsForFirstNonemptyCandidateSet.getResultingCall());
-            }
+        OverloadResolutionResultsImpl<F> results;
+        if (successfulResults != null) {
+            results = successfulResults;
         }
-        else {
+        else if (traceForFirstNonemptyCandidateSet == null) {
             tracing.unresolvedReference(context.trace);
             argumentTypeResolver.checkTypesWithNoCallee(context, SHAPE_FUNCTION_ARGUMENTS);
+            results = OverloadResolutionResultsImpl.<F>nameNotFound();
         }
-        return resultsForFirstNonemptyCandidateSet != null ? resultsForFirstNonemptyCandidateSet : OverloadResolutionResultsImpl.<F>nameNotFound();
+        else {
+            traceForFirstNonemptyCandidateSet.commit();
+            results = resultsForFirstNonemptyCandidateSet;
+        }
+        results.setAllCandidates(context.collectAllCandidates ? allCandidates : null);
+        return results;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -595,7 +618,7 @@ public class CallResolver {
                 for (ResolvedCallWithTrace<F> call : calls) {
                     task.tracing.bindReference(call.getTrace(), call);
                     task.tracing.bindResolvedCall(call.getTrace(), call);
-                    task.getResolvedCalls().add(call);
+                    task.addResolvedCall(call);
                 }
             }
         }

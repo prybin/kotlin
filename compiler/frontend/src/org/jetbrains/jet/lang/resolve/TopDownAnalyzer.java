@@ -154,7 +154,7 @@ public class TopDownAnalyzer {
 
                             private void registerTopLevelFqName(@NotNull JetNamedDeclaration declaration, @NotNull DeclarationDescriptor descriptor) {
                                 if (DescriptorUtils.isTopLevelDeclaration(descriptor)) {
-                                    FqName fqName = JetPsiUtil.getFQName(declaration);
+                                    FqName fqName = declaration.getFqName();
                                     if (fqName != null) {
                                         topLevelFqNames.put(fqName, declaration);
                                     }
@@ -190,7 +190,7 @@ public class TopDownAnalyzer {
                                     DescriptorResolver.resolvePackageHeader(packageDirective, moduleDescriptor, trace);
                                     registerDeclarations(file.getDeclarations());
 
-                                    topLevelFqNames.put(JetPsiUtil.getFQName(file), packageDirective);
+                                    topLevelFqNames.put(file.getPackageFqName(), packageDirective);
                                 }
                                 resolveAndCheckImports(file, resolveSession);
                             }
@@ -327,10 +327,12 @@ public class TopDownAnalyzer {
         for (ClassDescriptorWithResolutionScopes mutableClassDescriptor : c.getClasses().values()) {
             ((MutableClassDescriptor) mutableClassDescriptor).lockScopes();
         }
+
+        // SCRIPT: extra code for scripts
         Set<FqName> scriptFqNames = Sets.newHashSet();
         for (JetFile file : c.getFileScopes().keySet()) {
             if (file.isScript()) {
-                scriptFqNames.add(JetPsiUtil.getFQName(file));
+                scriptFqNames.add(file.getPackageFqName());
             }
         }
         for (MutablePackageFragmentDescriptor fragment : packageFragmentProvider.getAllFragments()) {

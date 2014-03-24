@@ -234,6 +234,11 @@ public class JvmBasicCompletionTestGenerated extends AbstractJvmBasicCompletionT
             doTest("idea/testData/completion/basic/common/InFunInClassInitializer.kt");
         }
         
+        @TestMetadata("InFunctionArguments.kt")
+        public void testInFunctionArguments() throws Exception {
+            doTest("idea/testData/completion/basic/common/InFunctionArguments.kt");
+        }
+        
         @TestMetadata("InGlobalPropertyInitializer.kt")
         public void testInGlobalPropertyInitializer() throws Exception {
             doTest("idea/testData/completion/basic/common/InGlobalPropertyInitializer.kt");
@@ -491,6 +496,11 @@ public class JvmBasicCompletionTestGenerated extends AbstractJvmBasicCompletionT
             @TestMetadata("CompactTypeNames.kt")
             public void testCompactTypeNames() throws Exception {
                 doTest("idea/testData/completion/basic/common/namedParameters/CompactTypeNames.kt");
+            }
+            
+            @TestMetadata("ForEmptyParametersFunction.kt")
+            public void testForEmptyParametersFunction() throws Exception {
+                doTest("idea/testData/completion/basic/common/namedParameters/ForEmptyParametersFunction.kt");
             }
             
             @TestMetadata("InParameterExpression.kt")

@@ -1,4 +1,8 @@
-// "class com.intellij.codeInspection.SuppressIntentionAction" "false"
+// "Suppress 'REDUNDANT_NULLABLE' for statement " "false"
+// ACTION: Disable 'Move lambda function into parentheses'
+// ACTION: Edit intention settings
+// ACTION: Move lambda function into parentheses
+// ACTION: Remove redundant '?'
 
 fun foo() {
     any {

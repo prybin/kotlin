@@ -33,6 +33,11 @@ import org.jetbrains.jet.parsing.AbstractJetParsingTest;
 @TestMetadata("compiler/testData/psi")
 @InnerTestClasses({JetParsingTestGenerated.Examples.class, JetParsingTestGenerated.FunctionReceivers.class, JetParsingTestGenerated.GreatSyntacticShift.class, JetParsingTestGenerated.Kdoc.class, JetParsingTestGenerated.PropertyDelegate.class, JetParsingTestGenerated.Recovery.class, JetParsingTestGenerated.StringTemplates.class})
 public class JetParsingTestGenerated extends AbstractJetParsingTest {
+    @TestMetadata("AbsentInnerType.kt")
+    public void testAbsentInnerType() throws Exception {
+        doParsingTest("compiler/testData/psi/AbsentInnerType.kt");
+    }
+    
     public void testAllFilesPresentInPsi() throws Exception {
         JetTestUtils.assertAllTestsPresentByMetadata(this.getClass(), "org.jetbrains.jet.generators.tests.TestsPackage", new File("compiler/testData/psi"), Pattern.compile("^(.+)\\.kt$"), true);
     }
@@ -901,6 +906,11 @@ public class JetParsingTestGenerated extends AbstractJetParsingTest {
         @TestMetadata("MissingCommaInValueParameterList.kt")
         public void testMissingCommaInValueParameterList() throws Exception {
             doParsingTest("compiler/testData/psi/recovery/MissingCommaInValueParameterList.kt");
+        }
+        
+        @TestMetadata("MissingCommaInValueParameterListWithValOrVar.kt")
+        public void testMissingCommaInValueParameterListWithValOrVar() throws Exception {
+            doParsingTest("compiler/testData/psi/recovery/MissingCommaInValueParameterListWithValOrVar.kt");
         }
         
         @TestMetadata("PackageNewLineRecovery.kt")

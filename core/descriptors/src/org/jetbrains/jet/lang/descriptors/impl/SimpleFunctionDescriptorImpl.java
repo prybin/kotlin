@@ -32,15 +32,6 @@ public class SimpleFunctionDescriptorImpl extends FunctionDescriptorImpl impleme
 
     private InlineStrategy inlineStrategy;
 
-    public SimpleFunctionDescriptorImpl(
-            @NotNull DeclarationDescriptor containingDeclaration,
-            @NotNull Annotations annotations,
-            @NotNull Name name,
-            @NotNull Kind kind
-    ) {
-        this(containingDeclaration, null, annotations, name, kind);
-    }
-
     protected SimpleFunctionDescriptorImpl(
             @NotNull DeclarationDescriptor containingDeclaration,
             @Nullable SimpleFunctionDescriptor original,
@@ -48,6 +39,16 @@ public class SimpleFunctionDescriptorImpl extends FunctionDescriptorImpl impleme
             @NotNull Name name,
             @NotNull Kind kind) {
         super(containingDeclaration, original, annotations, name, kind);
+    }
+
+    @NotNull
+    public static SimpleFunctionDescriptorImpl create(
+            @NotNull DeclarationDescriptor containingDeclaration,
+            @NotNull Annotations annotations,
+            @NotNull Name name,
+            @NotNull Kind kind
+    ) {
+        return new SimpleFunctionDescriptorImpl(containingDeclaration, null, annotations, name, kind);
     }
 
 
@@ -74,11 +75,16 @@ public class SimpleFunctionDescriptorImpl extends FunctionDescriptorImpl impleme
         return (SimpleFunctionDescriptor) super.getOriginal();
     }
 
+    @NotNull
     @Override
-    protected FunctionDescriptorImpl createSubstitutedCopy(DeclarationDescriptor newOwner, boolean preserveOriginal, Kind kind) {
+    protected FunctionDescriptorImpl createSubstitutedCopy(
+            @NotNull DeclarationDescriptor newOwner,
+            @Nullable FunctionDescriptor original,
+            @NotNull Kind kind
+    ) {
         return new SimpleFunctionDescriptorImpl(
                 newOwner,
-                preserveOriginal ? getOriginal() : null,
+                (SimpleFunctionDescriptor) original,
                 // TODO : safeSubstitute
                 getAnnotations(),
                 getName(),
@@ -88,7 +94,7 @@ public class SimpleFunctionDescriptorImpl extends FunctionDescriptorImpl impleme
     @NotNull
     @Override
     public SimpleFunctionDescriptor copy(DeclarationDescriptor newOwner, Modality modality, Visibility visibility, Kind kind, boolean copyOverrides) {
-        return (SimpleFunctionDescriptorImpl)doSubstitute(TypeSubstitutor.EMPTY, newOwner, modality, visibility, false, copyOverrides, kind);
+        return (SimpleFunctionDescriptorImpl)doSubstitute(TypeSubstitutor.EMPTY, newOwner, modality, visibility, null, copyOverrides, kind);
     }
 
     @NotNull

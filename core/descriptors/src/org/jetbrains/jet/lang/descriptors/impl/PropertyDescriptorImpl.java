@@ -53,8 +53,8 @@ public class PropertyDescriptorImpl extends VariableDescriptorImpl implements Pr
     private boolean setterProjectedOut;
 
     protected PropertyDescriptorImpl(
-            @Nullable PropertyDescriptor original,
             @NotNull DeclarationDescriptor containingDeclaration,
+            @Nullable PropertyDescriptor original,
             @NotNull Annotations annotations,
             @NotNull Modality modality,
             @NotNull Visibility visibility,
@@ -62,7 +62,7 @@ public class PropertyDescriptorImpl extends VariableDescriptorImpl implements Pr
             @NotNull Name name,
             @NotNull Kind kind
     ) {
-        super(containingDeclaration, annotations, name);
+        super(containingDeclaration, annotations, name, null);
         this.isVar = isVar;
         this.modality = modality;
         this.visibility = visibility;
@@ -70,7 +70,8 @@ public class PropertyDescriptorImpl extends VariableDescriptorImpl implements Pr
         this.kind = kind;
     }
 
-    public PropertyDescriptorImpl(
+    @NotNull
+    public static PropertyDescriptorImpl create(
             @NotNull DeclarationDescriptor containingDeclaration,
             @NotNull Annotations annotations,
             @NotNull Modality modality,
@@ -79,23 +80,7 @@ public class PropertyDescriptorImpl extends VariableDescriptorImpl implements Pr
             @NotNull Name name,
             @NotNull Kind kind
     ) {
-        this(null, containingDeclaration, annotations, modality, visibility, isVar, name, kind);
-    }
-
-    public PropertyDescriptorImpl(
-            @NotNull DeclarationDescriptor containingDeclaration,
-            @NotNull Annotations annotations,
-            @NotNull Modality modality,
-            @NotNull Visibility visibility,
-            boolean isVar,
-            @Nullable JetType receiverType,
-            @Nullable ReceiverParameterDescriptor expectedThisObject,
-            @NotNull Name name,
-            @NotNull JetType outType,
-            @NotNull Kind kind
-    ) {
-        this(containingDeclaration, annotations, modality, visibility, isVar, name, kind);
-        setType(outType, Collections.<TypeParameterDescriptor>emptyList(), expectedThisObject, receiverType);
+        return new PropertyDescriptorImpl(containingDeclaration, null, annotations, modality, visibility, isVar, name, kind);
     }
 
     public void setType(
@@ -211,12 +196,20 @@ public class PropertyDescriptorImpl extends VariableDescriptorImpl implements Pr
         if (originalSubstitutor.isEmpty()) {
             return this;
         }
-        return doSubstitute(originalSubstitutor, getContainingDeclaration(), modality, visibility, true, true, getKind());
+        return doSubstitute(originalSubstitutor, getContainingDeclaration(), modality, visibility, getOriginal(), true, getKind());
     }
 
-    private PropertyDescriptor doSubstitute(TypeSubstitutor originalSubstitutor,
-            DeclarationDescriptor newOwner, Modality newModality, Visibility newVisibility, boolean preserveOriginal, boolean copyOverrides, Kind kind) {
-        PropertyDescriptorImpl substitutedDescriptor = createSubstitutedCopy(newOwner, newModality, newVisibility, preserveOriginal ? getOriginal() : null, kind);
+    @Nullable
+    private PropertyDescriptor doSubstitute(
+            @NotNull TypeSubstitutor originalSubstitutor,
+            @NotNull DeclarationDescriptor newOwner,
+            @NotNull Modality newModality,
+            @NotNull Visibility newVisibility,
+            @Nullable PropertyDescriptor original,
+            boolean copyOverrides,
+            @NotNull Kind kind
+    ) {
+        PropertyDescriptorImpl substitutedDescriptor = createSubstitutedCopy(newOwner, newModality, newVisibility, original, kind);
 
         List<TypeParameterDescriptor> substitutedTypeParameters = Lists.newArrayList();
         TypeSubstitutor substitutor = DescriptorSubstitutor.substituteTypeParameters(getTypeParameters(), originalSubstitutor, substitutedDescriptor, substitutedTypeParameters);
@@ -298,8 +291,8 @@ public class PropertyDescriptorImpl extends VariableDescriptorImpl implements Pr
             @Nullable PropertyDescriptor original,
             @NotNull Kind kind
     ) {
-        return new PropertyDescriptorImpl(original, newOwner,
-                getAnnotations(), newModality, newVisibility, isVar(), getName(), kind);
+        return new PropertyDescriptorImpl(newOwner, original,
+                                          getAnnotations(), newModality, newVisibility, isVar(), getName(), kind);
     }
 
     @NotNull
@@ -342,6 +335,6 @@ public class PropertyDescriptorImpl extends VariableDescriptorImpl implements Pr
     @NotNull
     @Override
     public PropertyDescriptor copy(DeclarationDescriptor newOwner, Modality modality, Visibility visibility, Kind kind, boolean copyOverrides) {
-        return doSubstitute(TypeSubstitutor.EMPTY, newOwner, modality, visibility, false, copyOverrides, kind);
+        return doSubstitute(TypeSubstitutor.EMPTY, newOwner, modality, visibility, null, copyOverrides, kind);
     }
 }

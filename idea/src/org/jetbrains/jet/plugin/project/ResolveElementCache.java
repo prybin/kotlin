@@ -207,10 +207,16 @@ public class ResolveElementCache {
         }
     }
 
-    private static void annotationAdditionalResolve(KotlinCodeAnalyzer analyzer, JetAnnotationEntry jetAnnotationEntry) {
+    private static void annotationAdditionalResolve(ResolveSession resolveSession, JetAnnotationEntry jetAnnotationEntry) {
         JetDeclaration declaration = PsiTreeUtil.getParentOfType(jetAnnotationEntry, JetDeclaration.class);
         if (declaration != null) {
-            Annotated descriptor = analyzer.resolveToDescriptor(declaration);
+            Annotated descriptor = resolveSession.resolveToDescriptor(declaration);
+
+            resolveSession.getAnnotationResolver().resolveAnnotationsArguments(
+                    descriptor,
+                    resolveSession.getTrace(),
+                    resolveSession.getScopeProvider().getResolutionScopeForDeclaration(declaration)
+            );
 
             ForceResolveUtil.forceResolveAllContents(descriptor.getAnnotations());
         }
@@ -241,8 +247,8 @@ public class ResolveElementCache {
                                                     descriptor.getScopeForMemberDeclarationResolution());
     }
 
-    private static void propertyAdditionalResolve(ResolveSession resolveSession, final JetProperty jetProperty, BindingTrace trace, JetFile file) {
-        final JetScope propertyResolutionScope = resolveSession.getScopeProvider().getResolutionScopeForDeclaration(jetProperty);
+    private static void propertyAdditionalResolve(final ResolveSession resolveSession, final JetProperty jetProperty, BindingTrace trace, JetFile file) {
+        JetScope propertyResolutionScope = resolveSession.getScopeProvider().getResolutionScopeForDeclaration(jetProperty);
 
         BodyResolveContextForLazy bodyResolveContext = new BodyResolveContextForLazy(
                 createParameters(resolveSession),
@@ -251,7 +257,7 @@ public class ResolveElementCache {
                     public JetScope apply(JetDeclaration declaration) {
                         assert declaration.getParent() == jetProperty : "Must be called only for property accessors, but called for " +
                                                                         declaration;
-                        return propertyResolutionScope;
+                        return resolveSession.getScopeProvider().getResolutionScopeForDeclaration(declaration);
                     }
                 });
         BodyResolver bodyResolver = createBodyResolver(resolveSession, trace, file);

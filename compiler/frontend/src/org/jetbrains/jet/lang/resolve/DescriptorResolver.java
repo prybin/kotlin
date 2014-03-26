@@ -18,6 +18,7 @@ package org.jetbrains.jet.lang.resolve;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
@@ -54,9 +55,7 @@ import java.util.*;
 
 import static org.jetbrains.jet.lang.descriptors.ReceiverParameterDescriptor.NO_RECEIVER_PARAMETER;
 import static org.jetbrains.jet.lang.diagnostics.Errors.*;
-import static org.jetbrains.jet.lang.resolve.BindingContext.CONSTRUCTOR;
-import static org.jetbrains.jet.lang.resolve.BindingContext.REFERENCE_TARGET;
-import static org.jetbrains.jet.lang.resolve.BindingContext.RESOLUTION_SCOPE;
+import static org.jetbrains.jet.lang.resolve.BindingContext.*;
 import static org.jetbrains.jet.lang.resolve.DescriptorUtils.*;
 import static org.jetbrains.jet.lang.resolve.ModifiersChecker.*;
 import static org.jetbrains.jet.lexer.JetTokens.OVERRIDE_KEYWORD;
@@ -293,7 +292,7 @@ public class DescriptorResolver {
             @NotNull final DataFlowInfo dataFlowInfo,
             @NotNull Annotations annotations
     ) {
-        final SimpleFunctionDescriptorImpl functionDescriptor = new SimpleFunctionDescriptorImpl(
+        final SimpleFunctionDescriptorImpl functionDescriptor = SimpleFunctionDescriptorImpl.create(
                 containingDescriptor,
                 annotations,
                 JetPsiUtil.safeName(function.getName()),
@@ -379,7 +378,7 @@ public class DescriptorResolver {
         String functionName = COMPONENT_FUNCTION_NAME_PREFIX + parameterIndex;
         JetType returnType = property.getType();
 
-        SimpleFunctionDescriptorImpl functionDescriptor = new SimpleFunctionDescriptorImpl(
+        SimpleFunctionDescriptorImpl functionDescriptor = SimpleFunctionDescriptorImpl.create(
                 classDescriptor,
                 Annotations.EMPTY,
                 Name.identifier(functionName),
@@ -409,7 +408,7 @@ public class DescriptorResolver {
     ) {
         JetType returnType = classDescriptor.getDefaultType();
 
-        SimpleFunctionDescriptorImpl functionDescriptor = new SimpleFunctionDescriptorImpl(
+        SimpleFunctionDescriptorImpl functionDescriptor = SimpleFunctionDescriptorImpl.create(
                 classDescriptor,
                 Annotations.EMPTY,
                 COPY_METHOD_NAME,
@@ -423,7 +422,7 @@ public class DescriptorResolver {
             // If parameter hasn't corresponding property, so it mustn't have default value as a parameter in copy function for data class
             boolean declaresDefaultValue = propertyDescriptor != null;
             ValueParameterDescriptorImpl parameterDescriptor =
-                    new ValueParameterDescriptorImpl(functionDescriptor, parameter.getIndex(), parameter.getAnnotations(),
+                    new ValueParameterDescriptorImpl(functionDescriptor, null, parameter.getIndex(), parameter.getAnnotations(),
                                                      parameter.getName(), parameter.getType(),
                                                      declaresDefaultValue,
                                                      parameter.getVarargElementType());
@@ -546,6 +545,7 @@ public class DescriptorResolver {
         }
         ValueParameterDescriptorImpl valueParameterDescriptor = new ValueParameterDescriptorImpl(
                 declarationDescriptor,
+                null,
                 index,
                 annotations,
                 JetPsiUtil.safeName(valueParameter.getName()),
@@ -821,7 +821,7 @@ public class DescriptorResolver {
     ) {
         DeclarationDescriptor containingDeclaration = scope.getContainingDeclaration();
         if (JetPsiUtil.isScriptDeclaration(variable)) {
-            PropertyDescriptorImpl propertyDescriptor = new PropertyDescriptorImpl(
+            PropertyDescriptorImpl propertyDescriptor = PropertyDescriptorImpl.create(
                     containingDeclaration,
                     annotationResolver.resolveAnnotationsWithArguments(scope, variable.getModifierList(), trace),
                     Modality.FINAL,
@@ -883,7 +883,7 @@ public class DescriptorResolver {
                             ? resolveModalityFromModifiers(property, getDefaultModality(containingDeclaration, hasBody))
                             : Modality.FINAL;
         Visibility visibility = resolveVisibilityFromModifiers(property, getDefaultVisibility(property, containingDeclaration));
-        PropertyDescriptorImpl propertyDescriptor = new PropertyDescriptorImpl(
+        PropertyDescriptorImpl propertyDescriptor = PropertyDescriptorImpl.create(
                 containingDeclaration,
                 annotationResolver.resolveAnnotationsWithoutArguments(scope, modifierList, trace),
                 modality,
@@ -1127,11 +1127,11 @@ public class DescriptorResolver {
                     annotationResolver.resolveAnnotationsWithoutArguments(scope, setter.getModifierList(), trace);
             JetParameter parameter = setter.getParameter();
 
-            setterDescriptor = new PropertySetterDescriptorImpl(
-                    propertyDescriptor, annotations,
-                    resolveModalityFromModifiers(setter, propertyDescriptor.getModality()),
-                    resolveVisibilityFromModifiers(setter, propertyDescriptor.getVisibility()),
-                    setter.getBodyExpression() != null, false, CallableMemberDescriptor.Kind.DECLARATION);
+            setterDescriptor = new PropertySetterDescriptorImpl(propertyDescriptor, annotations,
+                                                                resolveModalityFromModifiers(setter, propertyDescriptor.getModality()),
+                                                                resolveVisibilityFromModifiers(setter, propertyDescriptor.getVisibility()),
+                                                                setter.getBodyExpression() != null, false,
+                                                                CallableMemberDescriptor.Kind.DECLARATION, null);
             if (parameter != null) {
 
                 // This check is redundant: the parser does not allow a default value, but we'll keep it just in case
@@ -1204,11 +1204,11 @@ public class DescriptorResolver {
                 }
             }
 
-            getterDescriptor = new PropertyGetterDescriptorImpl(
-                    propertyDescriptor, annotations,
-                    resolveModalityFromModifiers(getter, propertyDescriptor.getModality()),
-                    resolveVisibilityFromModifiers(getter, propertyDescriptor.getVisibility()),
-                    getter.getBodyExpression() != null, false, CallableMemberDescriptor.Kind.DECLARATION);
+            getterDescriptor = new PropertyGetterDescriptorImpl(propertyDescriptor, annotations,
+                                                                resolveModalityFromModifiers(getter, propertyDescriptor.getModality()),
+                                                                resolveVisibilityFromModifiers(getter, propertyDescriptor.getVisibility()),
+                                                                getter.getBodyExpression() != null, false,
+                                                                CallableMemberDescriptor.Kind.DECLARATION, null);
             getterDescriptor.initialize(returnType);
             trace.record(BindingContext.PROPERTY_ACCESSOR, getter, getterDescriptor);
         }
@@ -1228,7 +1228,7 @@ public class DescriptorResolver {
             @NotNull JetDeclaration declarationToTrace,
             List<TypeParameterDescriptor> typeParameters, @NotNull List<JetParameter> valueParameters, BindingTrace trace
     ) {
-        ConstructorDescriptorImpl constructorDescriptor = new ConstructorDescriptorImpl(
+        ConstructorDescriptorImpl constructorDescriptor = ConstructorDescriptorImpl.create(
                 classDescriptor,
                 annotationResolver.resolveAnnotationsWithoutArguments(scope, modifierList, trace),
                 isPrimary
@@ -1287,7 +1287,7 @@ public class DescriptorResolver {
             }
         }
 
-        PropertyDescriptorImpl propertyDescriptor = new PropertyDescriptorImpl(
+        PropertyDescriptorImpl propertyDescriptor = PropertyDescriptorImpl.create(
                 classDescriptor,
                 valueParameter.getAnnotations(),
                 resolveModalityFromModifiers(parameter, Modality.FINAL),
@@ -1467,5 +1467,17 @@ public class DescriptorResolver {
             assert parentPackageView != null : "package has no parent: " + packageView;
             trace.record(RESOLUTION_SCOPE, nameExpression, parentPackageView.getMemberScope());
         }
+    }
+
+    public static void registerFileInPackage(@NotNull BindingTrace trace, @NotNull JetFile file) {
+        // Register files corresponding to this package
+        // The trace currently does not support bi-di multimaps that would handle this task nicer
+        FqName fqName = file.getPackageFqName();
+        Collection<JetFile> files = trace.get(PACKAGE_TO_FILES, fqName);
+        if (files == null) {
+            files = Sets.newIdentityHashSet();
+        }
+        files.add(file);
+        trace.record(BindingContext.PACKAGE_TO_FILES, fqName, files);
     }
 }

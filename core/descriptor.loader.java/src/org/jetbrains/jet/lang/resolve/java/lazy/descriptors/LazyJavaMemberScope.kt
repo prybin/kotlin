@@ -77,7 +77,7 @@ public abstract class LazyJavaMemberScope(
                       }.toList())
 
         if (_containingDeclaration is JavaPackageFragmentDescriptor) {
-            val klass = c.javaClassResolver.resolveClassByFqName(_containingDeclaration.getFqName().child(name))
+            val klass = c.javaClassResolver.resolveClassByFqName(_containingDeclaration.fqName.child(name))
             if (klass is LazyJavaClassDescriptor && klass.getFunctionTypeForSamInterface() != null) {
                 functions.add(SingleAbstractMethodUtils.createSamConstructorFunction(_containingDeclaration, klass))
             }
@@ -101,7 +101,7 @@ public abstract class LazyJavaMemberScope(
 
     internal fun resolveMethodToFunctionDescriptor(method: JavaMethod, record: Boolean = true): SimpleFunctionDescriptor {
 
-        val functionDescriptorImpl = JavaMethodDescriptor(_containingDeclaration, c.resolveAnnotations(method), method.getName())
+        val functionDescriptorImpl = JavaMethodDescriptor.createJavaMethod(_containingDeclaration, c.resolveAnnotations(method), method.getName())
 
         val c = c.child(functionDescriptorImpl, method.getTypeParameters().toSet())
 
@@ -210,6 +210,7 @@ public abstract class LazyJavaMemberScope(
 
             ValueParameterDescriptorImpl(
                     function,
+                    null,
                     index,
                     c.resolveAnnotations(javaParameter),
                     name,

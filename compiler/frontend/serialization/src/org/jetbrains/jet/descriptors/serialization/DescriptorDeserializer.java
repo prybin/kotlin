@@ -137,8 +137,8 @@ public class DescriptorDeserializer {
         final int flags = proto.getFlags();
 
         DeserializedPropertyDescriptor property = new DeserializedPropertyDescriptor(
-                null,
                 containingDeclaration,
+                null,
                 getAnnotations(proto, flags, AnnotatedCallableKind.PROPERTY),
                 modality(Flags.MODALITY.get(flags)),
                 visibility(Flags.VISIBILITY.get(flags)),
@@ -165,11 +165,11 @@ public class DescriptorDeserializer {
             int getterFlags = proto.getGetterFlags();
             boolean isNotDefault = proto.hasGetterFlags() && Flags.IS_NOT_DEFAULT.get(getterFlags);
             if (isNotDefault) {
-                getter = new PropertyGetterDescriptorImpl(
-                        property, getAnnotations(proto, getterFlags, AnnotatedCallableKind.PROPERTY_GETTER),
-                        modality(Flags.MODALITY.get(getterFlags)), visibility(Flags.VISIBILITY.get(getterFlags)),
-                        isNotDefault, !isNotDefault, property.getKind()
-                );
+                getter = new PropertyGetterDescriptorImpl(property,
+                                                          getAnnotations(proto, getterFlags, AnnotatedCallableKind.PROPERTY_GETTER),
+                                                          modality(Flags.MODALITY.get(getterFlags)),
+                                                          visibility(Flags.VISIBILITY.get(getterFlags)), isNotDefault, !isNotDefault,
+                                                          property.getKind(), null);
             }
             else {
                 getter = DescriptorFactory.createDefaultGetter(property);
@@ -181,11 +181,11 @@ public class DescriptorDeserializer {
             int setterFlags = proto.getSetterFlags();
             boolean isNotDefault = proto.hasSetterFlags() && Flags.IS_NOT_DEFAULT.get(setterFlags);
             if (isNotDefault) {
-                setter = new PropertySetterDescriptorImpl(
-                        property, getAnnotations(proto, setterFlags, AnnotatedCallableKind.PROPERTY_SETTER),
-                        modality(Flags.MODALITY.get(setterFlags)), visibility(Flags.VISIBILITY.get(setterFlags)),
-                        isNotDefault, !isNotDefault, property.getKind()
-                );
+                setter = new PropertySetterDescriptorImpl(property,
+                                                          getAnnotations(proto, setterFlags, AnnotatedCallableKind.PROPERTY_SETTER),
+                                                          modality(Flags.MODALITY.get(setterFlags)),
+                                                          visibility(Flags.VISIBILITY.get(setterFlags)), isNotDefault, !isNotDefault,
+                                                          property.getKind(), null);
                 DescriptorDeserializer setterLocal = local.createChildDeserializer(setter, Collections.<TypeParameter>emptyList(),
                                                                                    Collections.<TypeParameterDescriptor>emptyList());
                 List<ValueParameterDescriptor> valueParameters = setterLocal.valueParameters(proto, AnnotatedCallableKind.PROPERTY_SETTER);
@@ -250,7 +250,7 @@ public class DescriptorDeserializer {
     @NotNull
     private CallableMemberDescriptor loadConstructor(@NotNull Callable proto) {
         ClassDescriptor classDescriptor = (ClassDescriptor) containingDeclaration;
-        ConstructorDescriptorImpl descriptor = new ConstructorDescriptorImpl(
+        ConstructorDescriptorImpl descriptor = ConstructorDescriptorImpl.create(
                 classDescriptor,
                 getAnnotations(proto, proto.getFlags(), AnnotatedCallableKind.FUNCTION),
                 // TODO: primary
@@ -401,6 +401,7 @@ public class DescriptorDeserializer {
             Callable.ValueParameter proto = protos.get(i);
             result.add(new ValueParameterDescriptorImpl(
                     containingDeclaration,
+                    null,
                     i,
                     getAnnotations(classOrPackage, callable, kind, proto),
                     nameResolver.getName(proto.getName()),

@@ -145,6 +145,7 @@ public class InjectorForTopDownAnalyzerBasic {
         this.topDownAnalyzer.setOverloadResolver(overloadResolver);
         this.topDownAnalyzer.setOverrideResolver(overrideResolver);
         this.topDownAnalyzer.setPackageFragmentProvider(mutablePackageFragmentProvider);
+        this.topDownAnalyzer.setProject(project);
         this.topDownAnalyzer.setScriptHeaderResolver(scriptHeaderResolver);
         this.topDownAnalyzer.setTrace(bindingTrace);
         this.topDownAnalyzer.setTypeHierarchyResolver(typeHierarchyResolver);
@@ -160,7 +161,8 @@ public class InjectorForTopDownAnalyzerBasic {
         bodyResolver.setTrace(bindingTrace);
 
         annotationResolver.setCallResolver(callResolver);
-        annotationResolver.setExpressionTypingServices(expressionTypingServices);
+        annotationResolver.setStorageManager(storageManager);
+        annotationResolver.setTypeResolver(typeResolver);
 
         callResolver.setArgumentTypeResolver(argumentTypeResolver);
         callResolver.setCandidateResolver(candidateResolver);

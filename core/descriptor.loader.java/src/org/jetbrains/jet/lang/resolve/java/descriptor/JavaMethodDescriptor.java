@@ -17,7 +17,9 @@
 package org.jetbrains.jet.lang.resolve.java.descriptor;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
+import org.jetbrains.jet.lang.descriptors.FunctionDescriptor;
 import org.jetbrains.jet.lang.descriptors.SimpleFunctionDescriptor;
 import org.jetbrains.jet.lang.descriptors.annotations.Annotations;
 import org.jetbrains.jet.lang.descriptors.impl.FunctionDescriptorImpl;
@@ -27,31 +29,23 @@ import org.jetbrains.jet.lang.resolve.name.Name;
 public class JavaMethodDescriptor extends SimpleFunctionDescriptorImpl implements JavaCallableMemberDescriptor {
     private Boolean hasStableParameterNames = null;
 
-    public JavaMethodDescriptor(
-            @NotNull DeclarationDescriptor containingDeclaration,
-            @NotNull Annotations annotations,
-            @NotNull Name name
-    ) {
-        this(containingDeclaration, annotations, name, Kind.DECLARATION);
-    }
-
     private JavaMethodDescriptor(
             @NotNull DeclarationDescriptor containingDeclaration,
-            @NotNull Annotations annotations,
-            @NotNull Name name,
-            @NotNull Kind kind
-    ) {
-        super(containingDeclaration, annotations, name, kind);
-    }
-
-    private JavaMethodDescriptor(
-            @NotNull DeclarationDescriptor containingDeclaration,
-            @NotNull SimpleFunctionDescriptor original,
+            @Nullable SimpleFunctionDescriptor original,
             @NotNull Annotations annotations,
             @NotNull Name name,
             @NotNull Kind kind
     ) {
         super(containingDeclaration, original, annotations, name, kind);
+    }
+
+    @NotNull
+    public static JavaMethodDescriptor createJavaMethod(
+            @NotNull DeclarationDescriptor containingDeclaration,
+            @NotNull Annotations annotations,
+            @NotNull Name name
+    ) {
+        return new JavaMethodDescriptor(containingDeclaration, null, annotations, name, Kind.DECLARATION);
     }
 
     @Override
@@ -64,11 +58,20 @@ public class JavaMethodDescriptor extends SimpleFunctionDescriptorImpl implement
         this.hasStableParameterNames = hasStableParameterNames;
     }
 
+    @NotNull
     @Override
-    protected FunctionDescriptorImpl createSubstitutedCopy(DeclarationDescriptor newOwner, boolean preserveOriginal, Kind kind) {
-        JavaMethodDescriptor result = preserveOriginal
-                                      ? new JavaMethodDescriptor(newOwner, getOriginal(), getAnnotations(), getName(), kind)
-                                      : new JavaMethodDescriptor(newOwner, getAnnotations(), getName(), kind);
+    protected FunctionDescriptorImpl createSubstitutedCopy(
+            @NotNull DeclarationDescriptor newOwner,
+            @Nullable FunctionDescriptor original,
+            @NotNull Kind kind
+    ) {
+        JavaMethodDescriptor result = new JavaMethodDescriptor(
+                newOwner,
+                (SimpleFunctionDescriptor) original,
+                getAnnotations(),
+                getName(),
+                kind
+        );
         result.setHasStableParameterNames(hasStableParameterNames());
         return result;
     }

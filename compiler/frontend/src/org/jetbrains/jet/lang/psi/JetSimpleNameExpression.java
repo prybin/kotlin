@@ -28,7 +28,7 @@ import org.jetbrains.jet.lexer.JetTokens;
 
 import static org.jetbrains.jet.lexer.JetTokens.*;
 
-public abstract class JetSimpleNameExpression extends JetReferenceExpression {
+public abstract class JetSimpleNameExpression extends JetExpressionImpl implements JetReferenceExpression {
     public static final TokenSet REFERENCE_TOKENS = TokenSet.orSet(LABELS, TokenSet.create(IDENTIFIER, FIELD_IDENTIFIER, THIS_KEYWORD, SUPER_KEYWORD));
 
     public JetSimpleNameExpression(@NotNull ASTNode node) {

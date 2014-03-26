@@ -26,7 +26,7 @@ import org.jetbrains.jet.lang.resolve.name.Name
 import org.jetbrains.jet.lexer.JetTokens
 import org.jetbrains.jet.lexer.JetTokens.*
 
-public abstract class JetSimpleNameExpression(node: ASTNode) : JetExpressionImpl(node), JetReferenceExpression {
+public trait JetSimpleNameExpression : JetReferenceExpression {
 
     public fun getReceiverExpression(): JetExpression? {
         val parent = getParent()
@@ -85,22 +85,28 @@ public abstract class JetSimpleNameExpression(node: ASTNode) : JetExpressionImpl
         return Name.identifierNoValidate(name)
     }
 
-    public fun getReferencedNameElement(): PsiElement {
-       return findChildByType(REFERENCE_TOKENS) ?:
-              findChildByType(JetExpressionParsing.ALL_OPERATIONS) ?:
-              this
-    }
+    public fun getReferencedNameElement(): PsiElement
 
-    public fun getIdentifier(): PsiElement? {
-        return findChildByType(JetTokens.IDENTIFIER)
-    }
+    public fun getIdentifier(): PsiElement?
 
     public fun getReferencedNameElementType(): IElementType {
         return getReferencedNameElement().getNode()!!.getElementType()!!
     }
+}
+
+abstract class JetSimpleNameExpressionImpl(node: ASTNode) : JetExpressionImpl(node), JetSimpleNameExpression {
+    public override fun getIdentifier(): PsiElement? {
+        return findChildByType(JetTokens.IDENTIFIER)
+    }
 
     override fun <R, D> accept(visitor: JetVisitor<R, D>, data: D?): R {
         return visitor.visitSimpleNameExpression(this, data) as R
+    }
+
+    public override fun getReferencedNameElement(): PsiElement {
+        return findChildByType(REFERENCE_TOKENS) ?:
+               findChildByType(JetExpressionParsing.ALL_OPERATIONS) ?:
+               this
     }
 
     class object {

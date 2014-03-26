@@ -257,3 +257,40 @@ public fun PsiDirectory.getPackage(): PsiPackage? = JavaDirectoryService.getInst
 public fun JetModifierListOwner.isPrivate(): Boolean = hasModifier(JetTokens.PRIVATE_KEYWORD)
 
 public fun PsiElement.isInsideOf(elements: Iterable<PsiElement>): Boolean = elements.any { it.isAncestor(this) }
+
+public fun JetSimpleNameExpression.getReceiverExpression(): JetExpression? {
+    val parent = getParent()
+    when {
+        parent is JetQualifiedExpression && !isImportDirectiveExpression() -> {
+            val receiverExpression = parent.getReceiverExpression()
+            // Name expression can't be receiver for itself
+            if (receiverExpression != this) {
+                return receiverExpression
+            }
+        }
+        parent is JetCallExpression -> {
+            //This is in case `a().b()`
+            val callExpression = (parent as JetCallExpression)
+            val grandParent = callExpression.getParent()
+            if (grandParent is JetQualifiedExpression) {
+                val parentsReceiver = grandParent.getReceiverExpression()
+                if (parentsReceiver != callExpression) {
+                    return parentsReceiver
+                }
+            }
+        }
+        parent is JetBinaryExpression && parent.getOperationReference() == this -> {
+            return parent.getLeft()!!
+        }
+        parent is JetUnaryExpression && parent.getOperationReference() == this -> {
+            return parent.getBaseExpression()!!
+        }
+        parent is JetUserType -> {
+            val qualifier = parent.getQualifier()
+            if (qualifier != null) {
+                return qualifier.getReferenceExpression()!!
+            }
+        }
+    }
+    return null
+}

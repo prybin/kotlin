@@ -24,9 +24,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.asm4.*;
-import org.jetbrains.asm4.commons.InstructionAdapter;
-import org.jetbrains.asm4.commons.Method;
+import org.jetbrains.org.objectweb.asm.*;
+import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter;
+import org.jetbrains.org.objectweb.asm.commons.Method;
 import org.jetbrains.jet.codegen.binding.CalculatedClosure;
 import org.jetbrains.jet.codegen.binding.CodegenBinding;
 import org.jetbrains.jet.codegen.binding.MutableClosure;
@@ -60,7 +60,7 @@ import org.jetbrains.jet.lexer.JetTokens;
 
 import java.util.*;
 
-import static org.jetbrains.asm4.Opcodes.*;
+import static org.jetbrains.org.objectweb.asm.Opcodes.*;
 import static org.jetbrains.jet.codegen.AsmUtil.*;
 import static org.jetbrains.jet.codegen.CodegenUtil.*;
 import static org.jetbrains.jet.codegen.binding.CodegenBinding.*;
@@ -970,7 +970,7 @@ public class ImplementationBodyCodegen extends ClassBodyCodegen {
 
         mv.visitCode();
         mv.visitFieldInsn(GETSTATIC, classAsmType.getInternalName(), VALUES, type.getDescriptor());
-        mv.visitMethodInsn(INVOKEVIRTUAL, type.getInternalName(), "clone", "()Ljava/lang/Object;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, type.getInternalName(), "clone", "()Ljava/lang/Object;", false);
         mv.visitTypeInsn(CHECKCAST, type.getInternalName());
         mv.visitInsn(ARETURN);
         FunctionCodegen.endVisit(mv, "values()", myClass);
@@ -984,7 +984,7 @@ public class ImplementationBodyCodegen extends ClassBodyCodegen {
         mv.visitCode();
         mv.visitLdcInsn(classAsmType);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Enum", "valueOf", "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;");
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Enum", "valueOf", "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;", false);
         mv.visitTypeInsn(CHECKCAST, classAsmType.getInternalName());
         mv.visitInsn(ARETURN);
         FunctionCodegen.endVisit(mv, "valueOf()", myClass);

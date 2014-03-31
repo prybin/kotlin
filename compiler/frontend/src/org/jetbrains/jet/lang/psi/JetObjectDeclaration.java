@@ -88,7 +88,7 @@ public class JetObjectDeclaration extends JetNamedDeclarationStub<PsiJetObjectSt
             assert parent instanceof JetDeclaration;
             return ((JetDeclaration)parent).getModifierList();
         }
-        return (JetModifierList) findChildByType(JetNodeTypes.MODIFIER_LIST);
+        return super.getModifierList();
     }
 
     public boolean isClassObject() {

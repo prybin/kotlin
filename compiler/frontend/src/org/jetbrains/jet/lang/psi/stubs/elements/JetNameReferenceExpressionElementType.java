@@ -47,7 +47,7 @@ public class JetNameReferenceExpressionElementType extends JetStubElementType<Ps
 
     @Override
     public PsiJetNameReferenceExpressionStub createStub(@NotNull JetNameReferenceExpression psi, StubElement parentStub) {
-        return new PsiJetNameReferenceExpressionStubImpl(parentStub, StringRef.fromNullableString(psi.getReferencedName()));
+        return new PsiJetNameReferenceExpressionStubImpl(parentStub, StringRef.fromString(psi.getReferencedName()));
     }
 
     @Override

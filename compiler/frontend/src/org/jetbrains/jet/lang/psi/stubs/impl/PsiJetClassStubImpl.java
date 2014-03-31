@@ -53,7 +53,8 @@ public class PsiJetClassStubImpl extends StubBase<JetClass> implements PsiJetCla
             boolean isEnumEntry,
             boolean isAnnotation,
             boolean isInner,
-            boolean isLocal) {
+            boolean isLocal
+    ) {
         super(parent, type);
         this.qualifiedName = qualifiedName;
         this.name = name;

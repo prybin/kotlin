@@ -18,35 +18,31 @@ package org.jetbrains.jet.lang.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.util.ArrayFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.JetNodeTypes;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetTypeProjectionStub;
 import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
-import org.jetbrains.jet.lexer.JetModifierKeywordToken;
 import org.jetbrains.jet.lexer.JetTokens;
 
-import java.util.Collections;
-import java.util.List;
+public class JetTypeProjection extends JetModifierListOwnerStub<PsiJetTypeProjectionStub> {
+    public static final JetTypeProjection[] EMPTY_ARRAY = new JetTypeProjection[0];
 
-public class JetTypeProjection extends JetElementImplStub<PsiJetTypeProjectionStub> implements JetModifierListOwner {
+    public static final ArrayFactory<JetTypeProjection> ARRAY_FACTORY = new ArrayFactory<JetTypeProjection>() {
+        @NotNull
+        @Override
+        public JetTypeProjection[] create(int count) {
+            return count == 0 ? EMPTY_ARRAY : new JetTypeProjection[count];
+        }
+    };
+
     public JetTypeProjection(@NotNull ASTNode node) {
         super(node);
     }
 
     public JetTypeProjection(@NotNull PsiJetTypeProjectionStub stub) {
         super(stub, JetStubElementTypes.TYPE_PROJECTION);
-    }
-
-    @Override
-    public JetModifierList getModifierList() {
-        return (JetModifierList) findChildByType(JetNodeTypes.MODIFIER_LIST);
-    }
-
-    @Override
-    public boolean hasModifier(JetModifierKeywordToken modifier) {
-        JetModifierList modifierList = getModifierList();
-        return modifierList != null && modifierList.hasModifier(modifier);
     }
 
     @NotNull
@@ -90,21 +86,5 @@ public class JetTypeProjection extends JetElementImplStub<PsiJetTypeProjectionSt
         }
 
         return null;
-    }
-
-    @NotNull
-    @Override
-    public List<JetAnnotationEntry> getAnnotationEntries() {
-        JetModifierList modifierList = getModifierList();
-        if (modifierList == null) return Collections.emptyList();
-        return modifierList.getAnnotationEntries();
-    }
-
-    @NotNull
-    @Override
-    public List<JetAnnotation> getAnnotations() {
-        JetModifierList modifierList = getModifierList();
-        if (modifierList == null) return Collections.emptyList();
-        return modifierList.getAnnotations();
     }
 }

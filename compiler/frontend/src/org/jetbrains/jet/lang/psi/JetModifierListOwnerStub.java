@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 JetBrains s.r.o.
+ * Copyright 2010-2014 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,19 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jet.lexer.JetModifierKeywordToken;
 import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
+import org.jetbrains.jet.lexer.JetModifierKeywordToken;
 
 import java.util.Collections;
 import java.util.List;
 
-abstract class JetDeclarationStub<T extends StubElement> extends JetModifierListOwnerStub<T> implements JetDeclaration {
-    public JetDeclarationStub(@NotNull T stub, @NotNull IStubElementType nodeType) {
-        super(stub, nodeType);
+public class JetModifierListOwnerStub<T extends StubElement> extends JetElementImplStub<T> implements JetModifierListOwner {
+    public JetModifierListOwnerStub(ASTNode node) {
+        super(node);
     }
 
-    public JetDeclarationStub(@NotNull ASTNode node) {
-        super(node);
+    public JetModifierListOwnerStub(T stub, IStubElementType nodeType) {
+        super(stub, nodeType);
     }
 
     @Override
@@ -48,16 +48,16 @@ abstract class JetDeclarationStub<T extends StubElement> extends JetModifierList
         return modifierList != null && modifierList.hasModifier(modifier);
     }
 
-    @NotNull
     @Override
+    @NotNull
     public List<JetAnnotationEntry> getAnnotationEntries() {
         JetModifierList modifierList = getModifierList();
         if (modifierList == null) return Collections.emptyList();
         return modifierList.getAnnotationEntries();
     }
 
-    @NotNull
     @Override
+    @NotNull
     public List<JetAnnotation> getAnnotations() {
         JetModifierList modifierList = getModifierList();
         if (modifierList == null) return Collections.emptyList();

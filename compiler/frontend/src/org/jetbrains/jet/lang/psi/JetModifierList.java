@@ -22,7 +22,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.JetNodeTypes;
-import org.jetbrains.jet.lang.psi.stubs.PsiJetPlaceHolderStub;
+import org.jetbrains.jet.lang.psi.stubs.PsiJetModifierListStub;
 import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
 import org.jetbrains.jet.lexer.JetKeywordToken;
 import org.jetbrains.jet.lexer.JetModifierKeywordToken;
@@ -32,12 +32,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class JetModifierList extends JetElementImplStub<PsiJetPlaceHolderStub> {
+public class JetModifierList extends JetElementImplStub<PsiJetModifierListStub> {
     public JetModifierList(@NotNull ASTNode node) {
         super(node);
     }
 
-    public JetModifierList(@NotNull PsiJetPlaceHolderStub stub) {
+    public JetModifierList(@NotNull PsiJetModifierListStub stub) {
         super(stub, JetStubElementTypes.MODIFIER_LIST);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 JetBrains s.r.o.
+ * Copyright 2010-2014 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.ReadOnly;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.impl.FunctionDescriptorImpl;
 import org.jetbrains.jet.lang.descriptors.impl.PropertyAccessorDescriptorImpl;
@@ -32,6 +33,7 @@ import org.jetbrains.jet.lang.types.checker.JetTypeChecker;
 
 import java.util.*;
 
+import static org.jetbrains.jet.lang.descriptors.CallableMemberDescriptor.Kind.*;
 import static org.jetbrains.jet.lang.resolve.OverridingUtil.OverrideCompatibilityInfo.Result.CONFLICT;
 import static org.jetbrains.jet.lang.resolve.OverridingUtil.OverrideCompatibilityInfo.Result.OVERRIDABLE;
 
@@ -691,5 +693,71 @@ public class OverridingUtil {
         public String getMessage() {
             return message;
         }
+    }
+
+    @NotNull
+    public static Set<CallableMemberDescriptor> getDirectlyOverriddenDeclarations(@NotNull CallableMemberDescriptor descriptor) {
+        Set<CallableMemberDescriptor> result = Sets.newHashSet();
+        Set<? extends CallableMemberDescriptor> overriddenDescriptors = descriptor.getOverriddenDescriptors();
+        for (CallableMemberDescriptor overriddenDescriptor : overriddenDescriptors) {
+            CallableMemberDescriptor.Kind kind = overriddenDescriptor.getKind();
+            if (kind == DECLARATION) {
+                result.add(overriddenDescriptor);
+            }
+            else if (kind == FAKE_OVERRIDE || kind == DELEGATION) {
+                result.addAll(getDirectlyOverriddenDeclarations(overriddenDescriptor));
+            }
+            else if (kind == SYNTHESIZED) {
+                //do nothing
+            }
+            else {
+                throw new AssertionError("Unexpected callable kind " + kind);
+            }
+        }
+        return filterOutOverridden(result);
+    }
+
+    @NotNull
+    public static Set<FunctionDescriptor> getDirectlyOverriddenDeclarations(@NotNull FunctionDescriptor descriptor) {
+        //noinspection unchecked
+        return (Set) getDirectlyOverriddenDeclarations((CallableMemberDescriptor) descriptor);
+    }
+
+    @NotNull
+    public static Set<PropertyDescriptor> getDirectlyOverriddenDeclarations(@NotNull PropertyDescriptor descriptor) {
+        //noinspection unchecked
+        return (Set) getDirectlyOverriddenDeclarations((CallableMemberDescriptor) descriptor);
+    }
+
+    @NotNull
+    public static <T extends CallableMemberDescriptor> Set<T> getAllOverriddenDeclarations(@NotNull T memberDescriptor) {
+        Set<T> result = Sets.newHashSet();
+        for (CallableMemberDescriptor overriddenDeclaration : memberDescriptor.getOverriddenDescriptors()) {
+            CallableMemberDescriptor.Kind kind = overriddenDeclaration.getKind();
+            if (kind == DECLARATION) {
+                //noinspection unchecked
+                result.add((T) overriddenDeclaration);
+            }
+            else if (kind == DELEGATION || kind == FAKE_OVERRIDE || kind == SYNTHESIZED) {
+                //do nothing
+            }
+            else {
+                throw new AssertionError("Unexpected callable kind " + kind);
+            }
+            //noinspection unchecked
+            result.addAll(getAllOverriddenDeclarations((T) overriddenDeclaration));
+        }
+        return result;
+    }
+
+    @NotNull
+    @ReadOnly
+    public static <T extends CallableMemberDescriptor> Set<T> getDeepestSuperDeclarations(T functionDescriptor) {
+        Set<T> overriddenDeclarations = getAllOverriddenDeclarations(functionDescriptor);
+        if (overriddenDeclarations.isEmpty()) {
+            return Collections.singleton(functionDescriptor);
+        }
+
+        return filterOutOverriding(overriddenDeclarations);
     }
 }

@@ -77,6 +77,10 @@ public class JetModifierList extends JetElementImplStub<PsiJetModifierListStub> 
     }
 
     public boolean hasModifier(JetModifierKeywordToken token) {
+        PsiJetModifierListStub stub = getStub();
+        if (stub != null) {
+            return stub.hasModifier(token);
+        }
         return getModifierNode(token) != null;
     }
 

@@ -47,7 +47,7 @@ public class JetImportDirectiveElementType extends JetStubElementType<PsiJetImpo
 
     @Override
     public PsiJetImportDirectiveStub createStub(@NotNull JetImportDirective psi, StubElement parentStub) {
-        StringRef aliasName = StringRef.fromNullableString(psi.getAliasName());
+        StringRef aliasName = StringRef.fromString(psi.getAliasName());
         return new PsiJetImportDirectiveStubImpl(parentStub, psi.isAbsoluteInRootPackage(), psi.isAllUnder(), aliasName);
     }
 

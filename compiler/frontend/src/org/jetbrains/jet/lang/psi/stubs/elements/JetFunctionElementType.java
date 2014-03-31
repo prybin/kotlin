@@ -68,7 +68,7 @@ public class JetFunctionElementType extends JetStubElementType<PsiJetFunctionStu
         boolean hasBlockBody = psi.hasBlockBody();
         boolean hasBody = psi.hasBody();
         return new PsiJetFunctionStubImpl(parentStub, StringRef.fromString(psi.getName()), isTopLevel, fqName,
-                                          isExtension, hasBlockBody, hasBody);
+                                          isExtension, hasBlockBody, hasBody, psi.hasTypeParameterListBeforeFunctionName());
     }
 
     @Override
@@ -82,6 +82,7 @@ public class JetFunctionElementType extends JetStubElementType<PsiJetFunctionStu
         dataStream.writeBoolean(stub.isExtension());
         dataStream.writeBoolean(stub.hasBlockBody());
         dataStream.writeBoolean(stub.hasBody());
+        dataStream.writeBoolean(stub.hasTypeParameterListBeforeFunctionName());
     }
 
     @NotNull
@@ -96,8 +97,10 @@ public class JetFunctionElementType extends JetStubElementType<PsiJetFunctionStu
         boolean isExtension = dataStream.readBoolean();
         boolean hasBlockBody = dataStream.readBoolean();
         boolean hasBody = dataStream.readBoolean();
+        boolean hasTypeParameterListBeforeFunctionName = dataStream.readBoolean();
 
-        return new PsiJetFunctionStubImpl(parentStub, name, isTopLevel, fqName, isExtension, hasBlockBody, hasBody);
+        return new PsiJetFunctionStubImpl(parentStub, name, isTopLevel, fqName, isExtension, hasBlockBody, hasBody,
+                                          hasTypeParameterListBeforeFunctionName);
     }
 
     @Override

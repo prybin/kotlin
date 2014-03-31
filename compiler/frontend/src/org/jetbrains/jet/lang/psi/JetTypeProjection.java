@@ -47,6 +47,11 @@ public class JetTypeProjection extends JetModifierListOwnerStub<PsiJetTypeProjec
 
     @NotNull
     public JetProjectionKind getProjectionKind() {
+        PsiJetTypeProjectionStub stub = getStub();
+        if (stub != null) {
+            return stub.getProjectionKind();
+        }
+
         ASTNode projectionNode = getProjectionNode();
         if (projectionNode == null) return JetProjectionKind.NONE;
 

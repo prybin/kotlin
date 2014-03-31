@@ -127,11 +127,11 @@ public class JetNamedFunction extends JetTypeParameterListOwnerStub<PsiJetFuncti
             //TODO: really?
             return typeReferences[0];
         }
-        return getReceiverTypeRefByPsi();
+        return getReceiverTypeRefByTree();
     }
 
     @Nullable
-    private JetTypeReference getReceiverTypeRefByPsi() {
+    private JetTypeReference getReceiverTypeRefByTree() {
         PsiElement child = getFirstChild();
         while (child != null) {
             IElementType tt = child.getNode().getElementType();

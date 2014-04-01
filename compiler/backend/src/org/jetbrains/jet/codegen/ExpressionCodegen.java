@@ -1808,7 +1808,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         DeclarationDescriptor containingDeclaration = propertyDescriptor.getContainingDeclaration();
 
         boolean isBackingFieldInAnotherClass = AsmUtil.isPropertyWithBackingFieldInOuterClass(propertyDescriptor);
-        boolean isStatic = containingDeclaration instanceof PackageFragmentDescriptor;
+        boolean isStatic = containingDeclaration instanceof PackageFragmentDescriptor || isBackingFieldInAnotherClass;
         boolean isSuper = superExpression != null;
         boolean isInsideClass = isCallInsideSameClassAsDeclared(propertyDescriptor, context);
 
@@ -1832,7 +1832,6 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                 //noinspection ConstantConditions
                 propertyDescriptor = (PropertyDescriptor) backingFieldContext.getAccessor(propertyDescriptor, true, delegateType);
             }
-            isStatic = true;
         }
 
         if (!skipPropertyAccessors) {
@@ -1870,17 +1869,10 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             }
         }
 
-        Type owner;
-        CallableMethod callableMethod = callableGetter != null ? callableGetter : callableSetter;
-
         propertyDescriptor = DescriptorUtils.unwrapFakeOverride(propertyDescriptor);
-        if (callableMethod == null) {
-            owner = typeMapper.getOwner(isBackingFieldInAnotherClass ? propertyDescriptor.getContainingDeclaration() : propertyDescriptor,
-                                        context.getContextKind(), isCallInsideSameModuleAsDeclared(propertyDescriptor, context));
-        }
-        else {
-            owner = callableMethod.getOwner();
-        }
+
+        Type backingFieldOwner = typeMapper.getOwner(isBackingFieldInAnotherClass ? propertyDescriptor.getContainingDeclaration() : propertyDescriptor,
+                                    context.getContextKind(), isCallInsideSameModuleAsDeclared(propertyDescriptor, context));
 
         String name;
         //noinspection ConstantConditions
@@ -1891,7 +1883,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
             name = JvmAbi.getDefaultPropertyName(propertyDescriptor.getName(), isDelegatedProperty, propertyDescriptor.getReceiverParameter() != null);
         }
 
-        return StackValue.property(propertyDescriptor, owner,
+        return StackValue.property(propertyDescriptor, backingFieldOwner,
                             typeMapper.mapType(isDelegatedProperty && forceField ? delegateType : propertyDescriptor.getOriginal().getType()),
                             isStatic, name, callableGetter, callableSetter, state);
 

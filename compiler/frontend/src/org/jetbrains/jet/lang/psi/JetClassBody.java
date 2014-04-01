@@ -32,7 +32,7 @@ import static org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes.*;
 
 public class JetClassBody extends JetElementImplStub<PsiJetPlaceHolderStub<JetClassBody>> implements JetDeclarationContainer {
     private static final TokenSet DECLARATION_TYPES =
-            TokenSet.create(CLASS, OBJECT_DECLARATION, CLASS_OBJECT, FUNCTION, PROPERTY, ANONYMOUS_INITIALIZER);
+            TokenSet.create(CLASS, OBJECT_DECLARATION, CLASS_OBJECT, FUNCTION, PROPERTY, ANONYMOUS_INITIALIZER, ENUM_ENTRY);
 
     public JetClassBody(@NotNull ASTNode node) {
         super(node);

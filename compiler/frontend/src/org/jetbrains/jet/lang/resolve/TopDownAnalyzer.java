@@ -76,8 +76,6 @@ public class TopDownAnalyzer {
     @NotNull
     private BodyResolver bodyResolver;
     @NotNull
-    private ScriptHeaderResolver scriptHeaderResolver;
-    @NotNull
     private Project project;
 
     @Inject
@@ -118,11 +116,6 @@ public class TopDownAnalyzer {
     @Inject
     public void setBodyResolver(@NotNull BodyResolver bodyResolver) {
         this.bodyResolver = bodyResolver;
-    }
-
-    @Inject
-    public void setScriptHeaderResolver(@NotNull ScriptHeaderResolver scriptHeaderResolver) {
-        this.scriptHeaderResolver = scriptHeaderResolver;
     }
 
     @Inject
@@ -187,7 +180,8 @@ public class TopDownAnalyzer {
                                 if (file.isScript()) {
                                     JetScript script = file.getScript();
                                     assert script != null;
-                                    scriptHeaderResolver.processScriptHierarchy(c, script, resolveSession.getScopeProvider().getFileScope(file));
+
+                                    c.getScripts().put(script, resolveSession.getScriptDescriptor(script));
                                 }
                                 else {
                                     JetPackageDirective packageDirective = file.getPackageDirective();
@@ -370,8 +364,7 @@ public class TopDownAnalyzer {
                         globalContext.getExceptionTracker(),
                         Predicates.equalTo(object.getContainingFile()),
                         false,
-                        true,
-                        Collections.<AnalyzerScriptParameter>emptyList()
+                        true
                 );
 
         InjectorForTopDownAnalyzerBasic injector = new InjectorForTopDownAnalyzerBasic(
@@ -437,16 +430,11 @@ public class TopDownAnalyzer {
     }
 
 
-    public void prepareForTheNextReplLine(@NotNull TopDownAnalysisContext c) {
-        c.getScriptScopes().clear();
-        c.getScripts().clear();
-    }
-
-
     @NotNull
     public MutablePackageFragmentProvider getPackageFragmentProvider() {
         return packageFragmentProvider;
     }
+
 }
 
 

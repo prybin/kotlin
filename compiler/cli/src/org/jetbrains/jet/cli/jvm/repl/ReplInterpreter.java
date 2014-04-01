@@ -83,8 +83,8 @@ public class ReplInterpreter {
     private int lineNumber = 0;
     @Nullable
     private JetScope lastLineScope;
-    private List<EarlierLine> earlierLines = Lists.newArrayList();
-    private List<String> previousIncompleteLines = Lists.newArrayList();
+    private final List<EarlierLine> earlierLines = Lists.newArrayList();
+    private final List<String> previousIncompleteLines = Lists.newArrayList();
     private final ReplClassLoader classLoader;
 
     @NotNull
@@ -108,8 +108,8 @@ public class ReplInterpreter {
                 new ExceptionTracker(), // dummy
                 Predicates.<PsiFile>alwaysTrue(),
                 false,
-                true,
-                Collections.<AnalyzerScriptParameter>emptyList());
+                true
+        );
         injector = new InjectorForTopDownAnalyzerForJvm(project, topDownAnalysisParameters, trace, module, MemberFilter.ALWAYS_TRUE);
         topDownAnalysisContext = new TopDownAnalysisContext(topDownAnalysisParameters);
         module.addFragmentProvider(SOURCES, injector.getTopDownAnalyzer().getPackageFragmentProvider());
@@ -128,6 +128,10 @@ public class ReplInterpreter {
         }
 
         classLoader = new ReplClassLoader(new URLClassLoader(classpath.toArray(new URL[0])));
+    }
+
+    private static void prepareForTheNextReplLine(@NotNull TopDownAnalysisContext c) {
+        c.getScripts().clear();
     }
 
     public enum LineResultType {
@@ -229,7 +233,7 @@ public class ReplInterpreter {
             return LineResult.error(errorCollector.getString());
         }
 
-        injector.getTopDownAnalyzer().prepareForTheNextReplLine(topDownAnalysisContext);
+        prepareForTheNextReplLine(topDownAnalysisContext);
         trace.clearDiagnostics();
 
         psiFile.getScript().putUserData(ScriptHeaderResolver.PRIORITY_KEY, lineNumber);
@@ -280,7 +284,12 @@ public class ReplInterpreter {
 
             earlierLines.add(new EarlierLine(line, scriptDescriptor, scriptClass, scriptInstance, scriptClassType));
 
-            return LineResult.successful(rv, scriptDescriptor.getReturnType().equals(KotlinBuiltIns.getInstance().getUnitType()));
+            return LineResult.successful(
+                        rv,
+                        KotlinBuiltIns.getInstance().getUnitType().equals(
+                                scriptDescriptor.getScriptCodeDescriptor().getReturnType()
+                        )
+            );
         } catch (Throwable e) {
             PrintWriter writer = new PrintWriter(System.err);
             classLoader.dumpClasses(writer);

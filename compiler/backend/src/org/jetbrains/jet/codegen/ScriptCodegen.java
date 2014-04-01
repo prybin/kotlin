@@ -30,7 +30,9 @@ import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
 import org.jetbrains.jet.lang.descriptors.ScriptDescriptor;
 import org.jetbrains.jet.lang.descriptors.ValueParameterDescriptor;
-import org.jetbrains.jet.lang.psi.*;
+import org.jetbrains.jet.lang.psi.JetDeclaration;
+import org.jetbrains.jet.lang.psi.JetScript;
+import org.jetbrains.jet.lang.psi.JetTypeParameterListOwner;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 
 import java.util.Collections;
@@ -63,13 +65,13 @@ public class ScriptCodegen extends MemberCodegen {
     }
 
     @NotNull
-    private JetScript scriptDeclaration;
+    private final JetScript scriptDeclaration;
 
     @NotNull
     private final ScriptContext context;
 
     @NotNull
-    private List<ScriptDescriptor> earlierScripts;
+    private final List<ScriptDescriptor> earlierScripts;
 
     private ScriptCodegen(
             @NotNull JetScript scriptDeclaration,
@@ -114,7 +116,7 @@ public class ScriptCodegen extends MemberCodegen {
             @NotNull MethodContext context
     ) {
 
-        Type blockType = typeMapper.mapType(scriptDescriptor.getReturnType());
+        Type blockType = typeMapper.mapType(scriptDescriptor.getScriptCodeDescriptor().getReturnType());
 
         classBuilder.newField(null, ACC_PUBLIC | ACC_FINAL, ScriptDescriptor.LAST_EXPRESSION_VALUE_FIELD_NAME,
                               blockType.getDescriptor(), null, null);
@@ -146,8 +148,8 @@ public class ScriptCodegen extends MemberCodegen {
         Type[] argTypes = jvmSignature.getAsmMethod().getArgumentTypes();
         int add = 0;
 
-        for (int i = 0; i < scriptDescriptor.getValueParameters().size(); i++) {
-            ValueParameterDescriptor parameter = scriptDescriptor.getValueParameters().get(i);
+        for (int i = 0; i < scriptDescriptor.getScriptCodeDescriptor().getValueParameters().size(); i++) {
+            ValueParameterDescriptor parameter = scriptDescriptor.getScriptCodeDescriptor().getValueParameters().get(i);
             frameMap.enter(parameter, argTypes[i + add]);
         }
 
@@ -167,7 +169,7 @@ public class ScriptCodegen extends MemberCodegen {
             instructionAdapter.putfield(classType.getInternalName(), getScriptFieldName(earlierScript), earlierClassType.getDescriptor());
         }
 
-        for (ValueParameterDescriptor parameter : scriptDescriptor.getValueParameters()) {
+        for (ValueParameterDescriptor parameter : scriptDescriptor.getScriptCodeDescriptor().getValueParameters()) {
             Type parameterType = typeMapper.mapType(parameter.getType());
             instructionAdapter.load(0, classType);
             instructionAdapter.load(offset, parameterType);
@@ -195,7 +197,7 @@ public class ScriptCodegen extends MemberCodegen {
             classBuilder.newField(null, access, getScriptFieldName(earlierScript), earlierClassName.getDescriptor(), null, null);
         }
 
-        for (ValueParameterDescriptor parameter : script.getValueParameters()) {
+        for (ValueParameterDescriptor parameter : script.getScriptCodeDescriptor().getValueParameters()) {
             Type parameterType = typeMapper.mapType(parameter);
             int access = ACC_PUBLIC | ACC_FINAL;
             classBuilder.newField(null, access, parameter.getName().getIdentifier(), parameterType.getDescriptor(), null, null);

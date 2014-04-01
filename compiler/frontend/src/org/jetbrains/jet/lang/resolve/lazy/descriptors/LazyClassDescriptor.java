@@ -31,10 +31,7 @@ import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.annotations.Annotations;
 import org.jetbrains.jet.lang.descriptors.impl.ClassDescriptorBase;
 import org.jetbrains.jet.lang.psi.*;
-import org.jetbrains.jet.lang.resolve.AnnotationResolver;
-import org.jetbrains.jet.lang.resolve.BindingContext;
-import org.jetbrains.jet.lang.resolve.DescriptorUtils;
-import org.jetbrains.jet.lang.resolve.TypeHierarchyResolver;
+import org.jetbrains.jet.lang.resolve.*;
 import org.jetbrains.jet.lang.resolve.lazy.ForceResolveUtil;
 import org.jetbrains.jet.lang.resolve.lazy.LazyEntity;
 import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
@@ -69,6 +66,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
         }
     };
     private final ResolveSession resolveSession;
+
     private final JetClassLikeInfo originalClassInfo;
     private final ClassMemberDeclarationProvider declarationProvider;
 
@@ -106,7 +104,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
         this.originalClassInfo = classLikeInfo;
         this.declarationProvider = resolveSession.getDeclarationProviderFactory().getClassMemberDeclarationProvider(classLikeInfo);
 
-        this.unsubstitutedMemberScope = new LazyClassMemberScope(resolveSession, declarationProvider, this);
+        this.unsubstitutedMemberScope = createMemberScope(resolveSession, this.declarationProvider);
 
         this.typeConstructor = new LazyClassTypeConstructor();
 
@@ -163,6 +161,15 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
                 return null;
             }
         }, null);
+    }
+
+    // NOTE: Called from constructor!
+    @NotNull
+    protected LazyClassMemberScope createMemberScope(
+            @NotNull ResolveSession resolveSession,
+            @NotNull ClassMemberDeclarationProvider declarationProvider
+    ) {
+        return new LazyClassMemberScope(resolveSession, declarationProvider, this, resolveSession.getTrace());
     }
 
     @NotNull
@@ -244,10 +251,10 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
         if (primaryConstructor == null) return getScopeForMemberDeclarationResolution();
 
         WritableScopeImpl scope = new WritableScopeImpl(JetScope.EMPTY, primaryConstructor, RedeclarationHandler.DO_NOTHING, "Scope with constructor parameters in " + getName());
-        for (ValueParameterDescriptor valueParameterDescriptor : primaryConstructor.getValueParameters()) {
-            JetParameter jetParameter = originalClassInfo.getPrimaryConstructorParameters().get(valueParameterDescriptor.getIndex());
+        for (int i = 0; i < originalClassInfo.getPrimaryConstructorParameters().size(); i++) {
+            JetParameter jetParameter = originalClassInfo.getPrimaryConstructorParameters().get(i);
             if (jetParameter.getValOrVarNode() == null) {
-                scope.addVariableDescriptor(valueParameterDescriptor);
+                scope.addVariableDescriptor(primaryConstructor.getValueParameters().get(i));
             }
         }
         scope.changeLockLevel(WritableScope.LockLevel.READING);

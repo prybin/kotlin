@@ -24,7 +24,6 @@ import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import kotlin.Function0;
 import kotlin.Function1;
-import kotlin.KotlinPackage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.ReadOnly;
@@ -33,19 +32,18 @@ import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.*;
 import org.jetbrains.jet.lang.resolve.lazy.data.JetClassLikeInfo;
+import org.jetbrains.jet.lang.resolve.lazy.data.JetScriptInfo;
 import org.jetbrains.jet.lang.resolve.lazy.declarations.DeclarationProviderFactory;
 import org.jetbrains.jet.lang.resolve.lazy.declarations.PackageMemberDeclarationProvider;
 import org.jetbrains.jet.lang.resolve.lazy.descriptors.LazyClassDescriptor;
 import org.jetbrains.jet.lang.resolve.lazy.descriptors.LazyPackageDescriptor;
+import org.jetbrains.jet.lang.resolve.lazy.descriptors.LazyScriptDescriptor;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.resolve.name.SpecialNames;
 import org.jetbrains.jet.lang.resolve.scopes.JetScope;
 import org.jetbrains.jet.renderer.DescriptorRenderer;
-import org.jetbrains.jet.storage.ExceptionTracker;
-import org.jetbrains.jet.storage.LazyResolveStorageManager;
-import org.jetbrains.jet.storage.LockBasedLazyResolveStorageManager;
-import org.jetbrains.jet.storage.MemoizedFunctionToNullable;
+import org.jetbrains.jet.storage.*;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -75,6 +73,8 @@ public class ResolveSession implements KotlinCodeAnalyzer {
     private final MemoizedFunctionToNullable<FqName, LazyPackageDescriptor> packages;
     private final PackageFragmentProvider packageFragmentProvider;
 
+    private final MemoizedFunctionToNotNull<JetScript, LazyScriptDescriptor> scriptDescriptors;
+
     private ScopeProvider scopeProvider;
 
     private JetImportsFactory jetImportFactory;
@@ -82,6 +82,8 @@ public class ResolveSession implements KotlinCodeAnalyzer {
     private DescriptorResolver descriptorResolver;
     private TypeResolver typeResolver;
     private QualifiedExpressionResolver qualifiedExpressionResolver;
+    private ScriptParameterResolver scriptParameterResolver;
+    private ScriptBodyResolver scriptBodyResolver;
 
     @Inject
     public void setJetImportFactory(JetImportsFactory jetImportFactory) {
@@ -111,6 +113,16 @@ public class ResolveSession implements KotlinCodeAnalyzer {
     @Inject
     public void setScopeProvider(ScopeProvider scopeProvider) {
         this.scopeProvider = scopeProvider;
+    }
+
+    @Inject
+    public void setScriptParameterResolver(ScriptParameterResolver scriptParameterResolver) {
+        this.scriptParameterResolver = scriptParameterResolver;
+    }
+
+    @Inject
+    public void setScriptBodyResolver(ScriptBodyResolver scriptBodyResolver) {
+        this.scriptBodyResolver = scriptBodyResolver;
     }
 
     // Only calls from injectors expected
@@ -160,6 +172,21 @@ public class ResolveSession implements KotlinCodeAnalyzer {
 
         // TODO: parameter modification
         rootDescriptor.addFragmentProvider(DependencyKind.SOURCES, packageFragmentProvider);
+
+        this.scriptDescriptors = storageManager.createMemoizedFunction(
+                new Function1<JetScript, LazyScriptDescriptor>() {
+                    @Override
+                    public LazyScriptDescriptor invoke(JetScript script) {
+                        return new LazyScriptDescriptor(
+                                ResolveSession.this,
+                                scriptParameterResolver,
+                                scriptBodyResolver,
+                                script,
+                                ScriptHeaderResolver.getScriptPriority(script)
+                        );
+                    }
+                }
+        );
     }
 
     @NotNull
@@ -210,14 +237,20 @@ public class ResolveSession implements KotlinCodeAnalyzer {
         PackageMemberDeclarationProvider provider = declarationProviderFactory.getPackageMemberDeclarationProvider(fqName.parent());
         if (provider == null) return Collections.emptyList();
 
-        return KotlinPackage.map(
+        return ContainerUtil.mapNotNull(
                 provider.getClassOrObjectDeclarations(fqName.shortName()),
-                new Function1<JetClassOrObject, ClassDescriptor>() {
+                new Function<JetClassLikeInfo, ClassDescriptor>() {
                     @Override
-                    public ClassDescriptor invoke(JetClassOrObject classOrObject) {
+                    public ClassDescriptor fun(JetClassLikeInfo classLikeInfo) {
+                        if (classLikeInfo instanceof JetScriptInfo) {
+                            return getClassDescriptorForScript(((JetScriptInfo) classLikeInfo).getScript());
+                        }
+                        JetClassOrObject classOrObject = classLikeInfo.getCorrespondingClassOrObject();
+                        if (classOrObject == null) return null;
                         return getClassDescriptor(classOrObject);
                     }
-                });
+                }
+        );
     }
 
     @Override
@@ -246,6 +279,20 @@ public class ResolveSession implements KotlinCodeAnalyzer {
         }
 
         return (ClassDescriptor) descriptor;
+    }
+
+    @NotNull
+    public ClassDescriptor getClassDescriptorForScript(@NotNull JetScript script) {
+        JetScope resolutionScope = getScopeProvider().getResolutionScopeForDeclaration(script);
+        FqName fqName = ScriptNameUtil.classNameForScript(script);
+        ClassifierDescriptor classifier = resolutionScope.getClassifier(fqName.shortName());
+        assert classifier != null : "No descriptor for " + fqName + " in file " + script.getContainingFile();
+        return (ClassDescriptor) classifier;
+    }
+
+    @NotNull
+    public ScriptDescriptor getScriptDescriptor(@NotNull JetScript script) {
+        return scriptDescriptors.invoke(script);
     }
 
     @NotNull

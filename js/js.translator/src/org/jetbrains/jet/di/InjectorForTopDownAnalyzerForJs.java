@@ -49,6 +49,7 @@ import org.jetbrains.jet.lang.resolve.DeclarationResolver;
 import org.jetbrains.jet.lang.resolve.ImportsResolver;
 import org.jetbrains.jet.lang.psi.JetImportsFactory;
 import org.jetbrains.jet.lang.resolve.ScriptHeaderResolver;
+import org.jetbrains.jet.lang.resolve.ScriptParameterResolver;
 import org.jetbrains.jet.lang.resolve.OverloadResolver;
 import org.jetbrains.jet.lang.resolve.OverrideResolver;
 import org.jetbrains.jet.lang.resolve.TypeHierarchyResolver;
@@ -92,6 +93,7 @@ public class InjectorForTopDownAnalyzerForJs {
     private final ImportsResolver importsResolver;
     private final JetImportsFactory jetImportsFactory;
     private final ScriptHeaderResolver scriptHeaderResolver;
+    private final ScriptParameterResolver scriptParameterResolver;
     private final OverloadResolver overloadResolver;
     private final OverrideResolver overrideResolver;
     private final TypeHierarchyResolver typeHierarchyResolver;
@@ -135,6 +137,7 @@ public class InjectorForTopDownAnalyzerForJs {
         this.importsResolver = new ImportsResolver();
         this.jetImportsFactory = new JetImportsFactory();
         this.scriptHeaderResolver = new ScriptHeaderResolver();
+        this.scriptParameterResolver = new ScriptParameterResolver();
         this.overloadResolver = new OverloadResolver();
         this.overrideResolver = new OverrideResolver();
         this.typeHierarchyResolver = new TypeHierarchyResolver();
@@ -146,7 +149,6 @@ public class InjectorForTopDownAnalyzerForJs {
         this.topDownAnalyzer.setOverrideResolver(overrideResolver);
         this.topDownAnalyzer.setPackageFragmentProvider(mutablePackageFragmentProvider);
         this.topDownAnalyzer.setProject(project);
-        this.topDownAnalyzer.setScriptHeaderResolver(scriptHeaderResolver);
         this.topDownAnalyzer.setTrace(bindingTrace);
         this.topDownAnalyzer.setTypeHierarchyResolver(typeHierarchyResolver);
 
@@ -217,7 +219,6 @@ public class InjectorForTopDownAnalyzerForJs {
         functionAnalyzerExtension.setTrace(bindingTrace);
 
         scriptBodyResolver.setExpressionTypingServices(expressionTypingServices);
-        scriptBodyResolver.setTrace(bindingTrace);
 
         declarationResolver.setAnnotationResolver(annotationResolver);
         declarationResolver.setDescriptorResolver(descriptorResolver);
@@ -232,9 +233,11 @@ public class InjectorForTopDownAnalyzerForJs {
 
         jetImportsFactory.setProject(project);
 
-        scriptHeaderResolver.setDependencyClassByQualifiedNameResolver(dependencyClassByQualifiedNameResolverDummy);
         scriptHeaderResolver.setPackageFragmentProvider(mutablePackageFragmentProvider);
+        scriptHeaderResolver.setScriptParameterResolver(scriptParameterResolver);
         scriptHeaderResolver.setTrace(bindingTrace);
+
+        scriptParameterResolver.setDependencyClassByQualifiedNameResolver(dependencyClassByQualifiedNameResolverDummy);
 
         overloadResolver.setTrace(bindingTrace);
 

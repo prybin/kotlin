@@ -16,6 +16,8 @@
 
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
+import com.intellij.psi.tree.TokenSet;
+
 public interface JetStubElementTypes {
     JetFileElementType FILE = new JetFileElementType();
 
@@ -26,36 +28,38 @@ public interface JetStubElementTypes {
     JetObjectElementType OBJECT_DECLARATION = new JetObjectElementType("OBJECT_DECLARATION");
     JetClassObjectElementType CLASS_OBJECT = new JetClassObjectElementType("CLASS_OBJECT");
     JetClassInitializerElementType ANONYMOUS_INITIALIZER = new JetClassInitializerElementType("ANONYMOUS_INITIALIZER");
-
     JetParameterElementType VALUE_PARAMETER = new JetParameterElementType("VALUE_PARAMETER");
+
     JetParameterListElementType VALUE_PARAMETER_LIST = new JetParameterListElementType("VALUE_PARAMETER_LIST");
-
     JetTypeParameterElementType TYPE_PARAMETER = new JetTypeParameterElementType("TYPE_PARAMETER");
+
     JetTypeParameterListElementType TYPE_PARAMETER_LIST = new JetTypeParameterListElementType("TYPE_PARAMETER_LIST");
-
     JetAnnotationEntryElementType ANNOTATION_ENTRY = new JetAnnotationEntryElementType("ANNOTATION_ENTRY");
-    JetAnnotationElementType ANNOTATION = new JetAnnotationElementType("ANNOTATION");
 
+    JetAnnotationElementType ANNOTATION = new JetAnnotationElementType("ANNOTATION");
     JetClassBodyElementType CLASS_BODY = new JetClassBodyElementType("CLASS_BODY");
+
     JetImportListElementType IMPORT_LIST = new JetImportListElementType("IMPORT_LIST");
     JetImportDirectiveElementType IMPORT_DIRECTIVE = new JetImportDirectiveElementType("IMPORT_DIRECTIVE");
-
     JetModifierListElementType MODIFIER_LIST = new JetModifierListElementType("MODIFIER_LIST");
-    JetModifierListElementType PRIMARY_CONSTRUCTOR_MODIFIER_LIST = new JetModifierListElementType("PRIMARY_CONSTRUCTOR_MODIFIER_LIST");
 
+    JetModifierListElementType PRIMARY_CONSTRUCTOR_MODIFIER_LIST = new JetModifierListElementType("PRIMARY_CONSTRUCTOR_MODIFIER_LIST");
     JetTypeConstraintListElementType TYPE_CONSTRAINT_LIST = new JetTypeConstraintListElementType("TYPE_CONSTRAINT_LIST");
 
     JetNullableTypeElementType NULLABLE_TYPE = new JetNullableTypeElementType("NULLABLE_TYPE");
+
     JetTypeReferenceElementType TYPE_REFERENCE = new JetTypeReferenceElementType("TYPE_REFERENCE");
     JetUserTypeElementType USER_TYPE = new JetUserTypeElementType("USER_TYPE");
     JetFunctionTypeElementType FUNCTION_TYPE = new JetFunctionTypeElementType("FUNCTION_TYPE");
     JetTypeProjectionElementType TYPE_PROJECTION = new JetTypeProjectionElementType("TYPE_PROJECTION");
     JetFunctionTypeReceiverElementType FUNCTION_TYPE_RECEIVER = new JetFunctionTypeReceiverElementType("FUNCTION_TYPE_RECEIVER");
-
     JetNameReferenceExpressionElementType REFERENCE_EXPRESSION = new JetNameReferenceExpressionElementType("REFERENCE_EXPRESSION");
-    JetDotQualifiedExpressionElementType DOT_QUALIFIED_EXPRESSION = new JetDotQualifiedExpressionElementType("DOT_QUALIFIED_EXPRESSION");
 
+    JetDotQualifiedExpressionElementType DOT_QUALIFIED_EXPRESSION = new JetDotQualifiedExpressionElementType("DOT_QUALIFIED_EXPRESSION");
     JetTypeArgumentListElementType TYPE_ARGUMENT_LIST = new JetTypeArgumentListElementType("TYPE_ARGUMENT_LIST");
 
     JetDelegationSpecifierListElementType DELEGATION_SPECIFIER_LIST = new JetDelegationSpecifierListElementType("DELEGATION_SPECIFIER_LIST");
+
+    TokenSet DECLARATION_TYPES =
+            TokenSet.create(CLASS, OBJECT_DECLARATION, CLASS_OBJECT, FUNCTION, PROPERTY, ANONYMOUS_INITIALIZER, ENUM_ENTRY);
 }

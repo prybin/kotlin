@@ -16,7 +16,6 @@
 
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
@@ -31,24 +30,14 @@ import java.io.IOException;
 
 import static org.jetbrains.jet.lang.psi.stubs.impl.PsiJetModifierListStubImpl.computeMaskFromPsi;
 
-public class JetModifierListElementType extends JetStubElementType<PsiJetModifierListStub, JetModifierList> {
+public abstract class JetModifierListElementType<T extends JetModifierList> extends JetStubElementType<PsiJetModifierListStub, T> {
     public JetModifierListElementType(@NotNull @NonNls String debugName) {
         super(debugName);
     }
 
     @Override
-    public JetModifierList createPsiFromAst(@NotNull ASTNode node) {
-        return new JetModifierList(node);
-    }
-
-    @Override
-    public JetModifierList createPsi(@NotNull PsiJetModifierListStub stub) {
-        return new JetModifierList(stub);
-    }
-
-    @Override
-    public PsiJetModifierListStub createStub(@NotNull JetModifierList psi, StubElement parentStub) {
-        return new PsiJetModifierListStubImpl(parentStub, computeMaskFromPsi(psi));
+    public PsiJetModifierListStub createStub(@NotNull T psi, StubElement parentStub) {
+        return new PsiJetModifierListStubImpl(parentStub, computeMaskFromPsi(psi), this);
     }
 
     @Override
@@ -61,7 +50,7 @@ public class JetModifierListElementType extends JetStubElementType<PsiJetModifie
     @Override
     public PsiJetModifierListStub deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         int mask = dataStream.readVarInt();
-        return new PsiJetModifierListStubImpl(parentStub, mask);
+        return new PsiJetModifierListStubImpl(parentStub, mask, this);
     }
 
     @Override

@@ -41,9 +41,9 @@ public interface JetStubElementTypes {
 
     JetImportListElementType IMPORT_LIST = new JetImportListElementType("IMPORT_LIST");
     JetImportDirectiveElementType IMPORT_DIRECTIVE = new JetImportDirectiveElementType("IMPORT_DIRECTIVE");
-    JetModifierListElementType MODIFIER_LIST = new JetModifierListElementType("MODIFIER_LIST");
+    JetDeclarationModifierListElementType MODIFIER_LIST = new JetDeclarationModifierListElementType("MODIFIER_LIST");
 
-    JetModifierListElementType PRIMARY_CONSTRUCTOR_MODIFIER_LIST = new JetModifierListElementType("PRIMARY_CONSTRUCTOR_MODIFIER_LIST");
+    JetPrimaryConstructorModifierListElementType PRIMARY_CONSTRUCTOR_MODIFIER_LIST = new JetPrimaryConstructorModifierListElementType("PRIMARY_CONSTRUCTOR_MODIFIER_LIST");
     JetTypeConstraintListElementType TYPE_CONSTRAINT_LIST = new JetTypeConstraintListElementType("TYPE_CONSTRAINT_LIST");
 
     JetNullableTypeElementType NULLABLE_TYPE = new JetNullableTypeElementType("NULLABLE_TYPE");

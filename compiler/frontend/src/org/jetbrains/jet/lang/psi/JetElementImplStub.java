@@ -73,6 +73,13 @@ public class JetElementImplStub<T extends StubElement> extends StubBasedPsiEleme
         return visitor.visitJetElement(this, data);
     }
 
+    @Override
+    public PsiReference getReference() {
+        PsiReference[] references = getReferences();
+        if (references.length == 1) return references[0];
+        else return null;
+    }
+
     @NotNull
     @Override
     public PsiReference[] getReferences() {

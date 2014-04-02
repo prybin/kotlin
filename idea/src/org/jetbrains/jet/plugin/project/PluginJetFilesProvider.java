@@ -45,6 +45,7 @@ import org.jetbrains.jet.plugin.JetPluginUtil;
 
 import java.util.*;
 
+// TODO: very suspicious, should be removed
 public class PluginJetFilesProvider extends JetFilesProvider {
     private final Project project;
 

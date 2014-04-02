@@ -45,6 +45,7 @@ public enum JSAnalyzerFacadeForIDEA implements AnalyzerFacade {
             @NotNull Collection<JetFile> files,
             @NotNull Predicate<PsiFile> filesToAnalyzeCompletely
     ) {
+        // TODO : replace with lazy resolve
         return AnalyzerFacadeForJS.analyzeFiles(files, filesToAnalyzeCompletely, new IDEAConfig(project), true);
     }
 

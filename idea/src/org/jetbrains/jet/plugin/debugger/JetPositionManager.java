@@ -196,6 +196,7 @@ public class JetPositionManager implements PositionManager {
             value = CachedValuesManager.getManager(file.getProject()).createCachedValue(new CachedValueProvider<JetTypeMapper>() {
                 @Override
                 public Result<JetTypeMapper> compute() {
+                    // TODO: use cache!
                     AnalyzeExhaust analyzeExhaust = AnalyzerFacadeWithCache.analyzeFileWithCache(file);
                     analyzeExhaust.throwIfError();
 

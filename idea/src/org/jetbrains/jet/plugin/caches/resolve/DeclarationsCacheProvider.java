@@ -33,6 +33,7 @@ import org.jetbrains.jet.plugin.project.TargetPlatform;
 
 import java.util.Collection;
 
+// TODO: unify
 public abstract class DeclarationsCacheProvider {
     private final CachedValue<ResolveSessionForBodies> lazyResolveCache;
 

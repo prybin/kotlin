@@ -204,6 +204,7 @@ public enum AnalyzerFacadeForJVM implements AnalyzerFacade {
                                                               storeContextForBodiesResolve, module, globalContext, memberFilter);
     }
 
+    // TODO: this method should not be called from the IDE any more
     @NotNull
     public static AnalyzeExhaust analyzeFilesWithJavaIntegrationInGlobalContext(
             Project project,

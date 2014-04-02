@@ -28,13 +28,13 @@ import com.intellij.psi.util.PsiModificationTracker;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.analyzer.AnalyzeExhaust;
-import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.BindingTrace;
 import org.jetbrains.jet.lang.resolve.BindingTraceContext;
 import org.jetbrains.jet.lang.resolve.java.AnalyzerFacadeForJVM;
 import org.jetbrains.jet.lang.resolve.java.JetFilesProvider;
 import org.jetbrains.jet.plugin.project.TargetPlatform;
 
+// TODO: unify
 class JvmDeclarationsCacheProvider extends DeclarationsCacheProvider {
     private final CachedValueProvider<KotlinDeclarationsCache> declarationsProvider;
     private final Key<CachedValue<KotlinDeclarationsCache>> cachedKey;
@@ -58,6 +58,7 @@ class JvmDeclarationsCacheProvider extends DeclarationsCacheProvider {
 
                     AnalyzeExhaust analyzeExhaust;
                     try {
+                        // TODO: replace with lazy resolve
                         analyzeExhaust = AnalyzerFacadeForJVM.analyzeFilesWithJavaIntegration(
                                 project,
                                 JetFilesProvider.getInstance(project).allInScope(GlobalSearchScope.allScope(project)),

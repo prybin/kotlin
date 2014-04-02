@@ -27,6 +27,7 @@ import org.jetbrains.jet.plugin.project.TargetPlatform;
 
 import java.util.Map;
 
+// TODO: to be changed a lot
 public class KotlinCacheManager {
     @NotNull
     public static KotlinCacheManager getInstance(@NotNull Project project) {

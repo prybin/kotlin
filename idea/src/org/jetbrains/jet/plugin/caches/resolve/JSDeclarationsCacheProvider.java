@@ -34,6 +34,7 @@ import org.jetbrains.k2js.analyze.AnalyzerFacadeForJS;
 import org.jetbrains.k2js.config.EcmaVersion;
 import org.jetbrains.k2js.config.LibrarySourcesConfig;
 
+// TODO: unify
 class JSDeclarationsCacheProvider extends DeclarationsCacheProvider {
     private final CachedValueProvider<KotlinDeclarationsCache> declarationsProvider;
     private final Key<CachedValue<KotlinDeclarationsCache>> cachedKey;
@@ -54,6 +55,7 @@ class JSDeclarationsCacheProvider extends DeclarationsCacheProvider {
                             ProjectStructureUtil.getLibLocationForProject(project),
                             EcmaVersion.defaultVersion(), false);
 
+                    // TODO: This should be replaced by lazy resolve
                     AnalyzeExhaust analyzeExhaust = AnalyzerFacadeForJS.analyzeFiles(
                             JetFilesProvider.getInstance(project).allInScope(GlobalSearchScope.allScope(project)),
                             Predicates.<PsiFile>alwaysFalse(),

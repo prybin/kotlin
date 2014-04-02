@@ -48,6 +48,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+// TODO: should be unified
 public class ResolveElementCache {
     private final CachedValue<MemoizedFunctionToNotNull<JetElement, BindingContext>> additionalResolveCache;
     private final ResolveSession resolveSession;

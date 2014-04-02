@@ -64,6 +64,7 @@ public final class AnalyzerFacadeWithCache {
     private AnalyzerFacadeWithCache() {
     }
 
+    // TODO: eliminate all usages of this method
     /**
      * Analyze project with string cache for given file. Given file will be fully analyzed.
      */
@@ -114,6 +115,7 @@ public final class AnalyzerFacadeWithCache {
         return AnalyzeExhaust.error(bindingTraceContext.getBindingContext(), e);
     }
 
+    // TODO: Should be unified with other sessions
     private static final SLRUCache<JetFile, CachedValue<ResolveSessionForBodies>> PER_FILE_SESSION_CACHE = new SLRUCache<JetFile, CachedValue<ResolveSessionForBodies>>(2, 3) {
         @NotNull
         @Override
@@ -148,6 +150,7 @@ public final class AnalyzerFacadeWithCache {
         }
     };
 
+    // TODO: should be unified
     private static class SLRUCachedAnalyzeExhaustProvider implements CachedValueProvider<SLRUCache<JetFile, AnalyzeExhaust>> {
         @Nullable
         @Override
@@ -165,6 +168,7 @@ public final class AnalyzerFacadeWithCache {
 
                         ApplicationUtils.warnTimeConsuming(LOG);
 
+                        // TODO: no need to analyze headers, only get the resolve session
                         AnalyzeExhaust analyzeExhaustHeaders = analyzeHeadersWithCacheOnFile(file, globalContext);
                         return analyzeBodies(analyzeExhaustHeaders, file);
                     }
@@ -193,6 +197,7 @@ public final class AnalyzerFacadeWithCache {
                 fileToCache.putUserData(LibrarySourceHacks.SKIP_TOP_LEVEL_MEMBERS, true);
                 // Resolve this file, not only project files (as KotlinCacheManager do)
 
+                // TODO: This is very suspicious, since no caching seems to happen in this situation, and we only do it in JVM mode, ignoring JS
                 return AnalyzerFacadeForJVM
                         .analyzeFilesWithJavaIntegrationInGlobalContext(
                                 fileToCache.getProject(),

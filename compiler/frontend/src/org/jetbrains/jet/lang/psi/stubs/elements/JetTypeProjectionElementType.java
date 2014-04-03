@@ -16,8 +16,6 @@
 
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -31,17 +29,7 @@ import java.io.IOException;
 
 public class JetTypeProjectionElementType extends JetStubElementType<PsiJetTypeProjectionStub, JetTypeProjection> {
     public JetTypeProjectionElementType(@NotNull @NonNls String debugName) {
-        super(debugName);
-    }
-
-    @Override
-    public JetTypeProjection createPsiFromAst(@NotNull ASTNode node) {
-        return new JetTypeProjection(node);
-    }
-
-    @Override
-    public JetTypeProjection createPsi(@NotNull PsiJetTypeProjectionStub stub) {
-        return new JetTypeProjection(stub);
+        super(debugName, JetTypeProjection.class, PsiJetTypeProjectionStub.class);
     }
 
     @Override
@@ -59,10 +47,5 @@ public class JetTypeProjectionElementType extends JetStubElementType<PsiJetTypeP
     public PsiJetTypeProjectionStub deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         int projectionKindOrdinal = dataStream.readVarInt();
         return new PsiJetTypeProjectionStubImpl(parentStub, projectionKindOrdinal);
-    }
-
-    @Override
-    public void indexStub(@NotNull PsiJetTypeProjectionStub stub, @NotNull IndexSink sink) {
-        //do nothing
     }
 }

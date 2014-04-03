@@ -16,7 +16,6 @@
 
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
-import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;

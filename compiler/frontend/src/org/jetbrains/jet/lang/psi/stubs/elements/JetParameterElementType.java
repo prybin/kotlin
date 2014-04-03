@@ -18,7 +18,6 @@ package org.jetbrains.jet.lang.psi.stubs.elements;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -34,17 +33,7 @@ import java.io.IOException;
 
 public class JetParameterElementType extends JetStubElementType<PsiJetParameterStub, JetParameter> {
     public JetParameterElementType(@NotNull @NonNls String debugName) {
-        super(debugName);
-    }
-
-    @Override
-    public JetParameter createPsiFromAst(@NotNull ASTNode node) {
-        return new JetParameter(node);
-    }
-
-    @Override
-    public JetParameter createPsi(@NotNull PsiJetParameterStub stub) {
-        return new JetParameter(stub);
+        super(debugName, JetParameter.class, PsiJetParameterStub.class);
     }
 
     @Override
@@ -86,10 +75,5 @@ public class JetParameterElementType extends JetStubElementType<PsiJetParameterS
         FqName fqName = fqNameAsString != null ? new FqName(fqNameAsString.toString()) : null;
 
          return new PsiJetParameterStubImpl(parentStub, fqName, name, isMutable, isVarArg, hasValOrValNode, hasDefaultValue);
-    }
-
-    @Override
-    public void indexStub(@NotNull PsiJetParameterStub stub, @NotNull IndexSink sink) {
-        // No index
     }
 }

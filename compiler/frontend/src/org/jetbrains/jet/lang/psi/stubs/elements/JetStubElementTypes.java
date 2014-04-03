@@ -17,6 +17,7 @@
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
 import com.intellij.psi.tree.TokenSet;
+import org.jetbrains.jet.lang.psi.JetClassInitializer;
 
 public interface JetStubElementTypes {
     JetFileElementType FILE = new JetFileElementType();
@@ -27,7 +28,8 @@ public interface JetStubElementTypes {
     JetClassElementType ENUM_ENTRY = new JetClassElementType("ENUM_ENTRY");
     JetObjectElementType OBJECT_DECLARATION = new JetObjectElementType("OBJECT_DECLARATION");
     JetClassObjectElementType CLASS_OBJECT = new JetClassObjectElementType("CLASS_OBJECT");
-    JetClassInitializerElementType ANONYMOUS_INITIALIZER = new JetClassInitializerElementType("ANONYMOUS_INITIALIZER");
+    JetPlaceHolderStubElementType<JetClassInitializer> ANONYMOUS_INITIALIZER =
+            new JetPlaceHolderStubElementType<JetClassInitializer>("ANONYMOUS_INITIALIZER", JetClassInitializer.class);
     JetParameterElementType VALUE_PARAMETER = new JetParameterElementType("VALUE_PARAMETER");
 
     JetParameterListElementType VALUE_PARAMETER_LIST = new JetParameterListElementType("VALUE_PARAMETER_LIST");

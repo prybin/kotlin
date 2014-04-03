@@ -65,7 +65,8 @@ public interface JetStubElementTypes {
     JetPlaceHolderStubElementType<JetNullableType> NULLABLE_TYPE =
             new JetPlaceHolderStubElementType<JetNullableType>("NULLABLE_TYPE", JetNullableType.class);
 
-    JetTypeReferenceElementType TYPE_REFERENCE = new JetTypeReferenceElementType("TYPE_REFERENCE");
+    JetPlaceHolderStubElementType<JetTypeReference> TYPE_REFERENCE =
+            new JetPlaceHolderStubElementType<JetTypeReference>("TYPE_REFERENCE", JetTypeReference.class);
     JetUserTypeElementType USER_TYPE = new JetUserTypeElementType("USER_TYPE");
 
     JetPlaceHolderStubElementType<JetFunctionType> FUNCTION_TYPE =

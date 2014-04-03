@@ -28,12 +28,6 @@ public class JetDotQualifiedExpressionElementType extends JetPlaceHolderStubElem
         super(debugName, JetDotQualifiedExpression.class);
     }
 
-    @NotNull
-    @Override
-    protected JetPlaceHolderStubElementType<JetDotQualifiedExpression> getInstance() {
-        return JetStubElementTypes.DOT_QUALIFIED_EXPRESSION;
-    }
-
     @Override
     public boolean shouldCreateStub(ASTNode node) {
         return PsiTreeUtil.getParentOfType(node.getPsi(), JetImportDirective.class) != null;

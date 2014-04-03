@@ -22,7 +22,6 @@ import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.psi.JetModifierList;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetModifierListStub;
-import org.jetbrains.jet.lang.psi.stubs.elements.JetDeclarationModifierListElementType;
 import org.jetbrains.jet.lang.psi.stubs.elements.JetModifierListElementType;
 import org.jetbrains.jet.lexer.JetModifierKeywordToken;
 

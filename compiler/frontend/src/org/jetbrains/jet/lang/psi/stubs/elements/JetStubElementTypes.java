@@ -55,7 +55,8 @@ public interface JetStubElementTypes {
             new JetPlaceHolderStubElementType<JetImportList>("IMPORT_LIST", JetImportList.class);
 
     JetImportDirectiveElementType IMPORT_DIRECTIVE = new JetImportDirectiveElementType("IMPORT_DIRECTIVE");
-    JetDeclarationModifierListElementType MODIFIER_LIST = new JetDeclarationModifierListElementType("MODIFIER_LIST");
+    JetModifierListElementType<JetDeclarationModifierList> MODIFIER_LIST =
+            new JetModifierListElementType<JetDeclarationModifierList>("MODIFIER_LIST", JetDeclarationModifierList.class);
 
     JetPrimaryConstructorModifierListElementType PRIMARY_CONSTRUCTOR_MODIFIER_LIST = new JetPrimaryConstructorModifierListElementType("PRIMARY_CONSTRUCTOR_MODIFIER_LIST");
 

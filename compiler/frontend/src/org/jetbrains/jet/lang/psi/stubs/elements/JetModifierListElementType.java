@@ -16,7 +16,6 @@
 
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
-import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -30,9 +29,9 @@ import java.io.IOException;
 
 import static org.jetbrains.jet.lang.psi.stubs.impl.PsiJetModifierListStubImpl.computeMaskFromPsi;
 
-public abstract class JetModifierListElementType<T extends JetModifierList> extends JetStubElementType<PsiJetModifierListStub, T> {
-    public JetModifierListElementType(@NotNull @NonNls String debugName) {
-        super(debugName);
+public class JetModifierListElementType<T extends JetModifierList> extends JetStubElementType<PsiJetModifierListStub, T> {
+    public JetModifierListElementType(@NotNull @NonNls String debugName, @NotNull Class<T> psiClass) {
+        super(debugName, psiClass, PsiJetModifierListStub.class);
     }
 
     @Override
@@ -51,10 +50,5 @@ public abstract class JetModifierListElementType<T extends JetModifierList> exte
     public PsiJetModifierListStub deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         int mask = dataStream.readVarInt();
         return new PsiJetModifierListStubImpl(parentStub, mask, this);
-    }
-
-    @Override
-    public void indexStub(@NotNull PsiJetModifierListStub stub, @NotNull IndexSink sink) {
-        //do nothing
     }
 }

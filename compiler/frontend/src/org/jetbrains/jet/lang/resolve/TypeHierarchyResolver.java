@@ -16,13 +16,15 @@
 
 package org.jetbrains.jet.lang.resolve;
 
-import com.google.common.collect.Lists;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
-import org.jetbrains.jet.lang.descriptors.impl.*;
+import org.jetbrains.jet.lang.descriptors.impl.ConstructorDescriptorImpl;
+import org.jetbrains.jet.lang.descriptors.impl.MutableClassDescriptor;
+import org.jetbrains.jet.lang.descriptors.impl.MutablePackageFragmentDescriptor;
+import org.jetbrains.jet.lang.descriptors.impl.PackageLikeBuilder;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.resolve.name.SpecialNames;
@@ -31,7 +33,6 @@ import org.jetbrains.jet.lang.resolve.scopes.JetScope;
 import org.jetbrains.jet.lang.resolve.scopes.WritableScope;
 import org.jetbrains.jet.lang.resolve.scopes.WriteThroughScope;
 import org.jetbrains.jet.lang.types.JetType;
-import org.jetbrains.jet.lang.types.TypeConstructor;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 import org.jetbrains.jet.utils.DFS;
 
@@ -48,6 +49,25 @@ import static org.jetbrains.jet.lang.resolve.ModifiersChecker.resolveVisibilityF
 import static org.jetbrains.jet.lang.resolve.name.SpecialNames.getClassObjectName;
 
 public class TypeHierarchyResolver {
+    private static final DFS.Neighbors<ClassDescriptor> CLASS_INHERITANCE_EDGES = new DFS.Neighbors<ClassDescriptor>() {
+        @NotNull
+        @Override
+        public Iterable<ClassDescriptor> getNeighbors(ClassDescriptor current) {
+            List<ClassDescriptor> result = new ArrayList<ClassDescriptor>();
+            for (JetType supertype : current.getDefaultType().getConstructor().getSupertypes()) {
+                DeclarationDescriptor descriptor = supertype.getConstructor().getDeclarationDescriptor();
+                if (descriptor instanceof ClassDescriptor) {
+                    result.add((ClassDescriptor) descriptor);
+                }
+            }
+            DeclarationDescriptor container = current.getContainingDeclaration();
+            if (container instanceof ClassDescriptor) {
+                result.add((ClassDescriptor) container);
+            }
+            return result;
+        }
+    };
+
     @NotNull
     private ImportsResolver importsResolver;
     @NotNull
@@ -105,12 +125,12 @@ public class TypeHierarchyResolver {
                 JetScope scope = c.normalScope.get(declarationContainer);
 
                 // Even more temp code
-                if (descriptorForDeferredResolve instanceof MutableClassDescriptorLite) {
+                if (descriptorForDeferredResolve instanceof MutableClassDescriptor) {
                     forDeferredResolve.addAll(
                             collectPackageFragmentsAndClassifiers(
                                     c,
                                     scope,
-                                    ((MutableClassDescriptorLite) descriptorForDeferredResolve).getBuilder(),
+                                    ((MutableClassDescriptor) descriptorForDeferredResolve).getBuilder(),
                                     declarationContainer.getDeclarations()));
                 }
                 else if (descriptorForDeferredResolve instanceof MutablePackageFragmentDescriptor) {
@@ -182,7 +202,7 @@ public class TypeHierarchyResolver {
 
             ClassKind kind = descriptor.getKind();
             if (kind == ClassKind.ENUM_ENTRY || kind == ClassKind.OBJECT || kind == ClassKind.ENUM_CLASS) {
-                MutableClassDescriptorLite classObject = descriptor.getClassObjectDescriptor();
+                MutableClassDescriptor classObject = descriptor.getClassObjectDescriptor();
                 assert classObject != null : "Enum entries and named objects should have class objects: " + classOrObject.getText();
 
                 JetType supertype;
@@ -218,38 +238,22 @@ public class TypeHierarchyResolver {
         }
     }
 
-    private static List<MutableClassDescriptorLite> topologicallySortClassesAndObjects(@NotNull TopDownAnalysisContext c) {
-        // A topsort is needed only for better diagnostics:
-        //    edges that get removed to disconnect loops are more reasonable in this case
-        //noinspection unchecked
-        return DFS.topologicalOrder(
-                (Iterable) c.getAllClasses(),
-                new DFS.Neighbors<MutableClassDescriptorLite>() {
-                    @NotNull
-                    @Override
-                    public Iterable<MutableClassDescriptorLite> getNeighbors(MutableClassDescriptorLite current) {
-                        List<MutableClassDescriptorLite> result = Lists.newArrayList();
-                        for (JetType supertype : current.getSupertypes()) {
-                            DeclarationDescriptor declarationDescriptor = supertype.getConstructor().getDeclarationDescriptor();
-                            if (declarationDescriptor instanceof MutableClassDescriptorLite) {
-                                MutableClassDescriptorLite classDescriptor = (MutableClassDescriptorLite) declarationDescriptor;
-                                result.add(classDescriptor);
-                            }
-                        }
-                        return result;
-                    }
-                });
-
+    @NotNull
+    @SuppressWarnings("unchecked")
+    private static List<MutableClassDescriptor> topologicallySortClassesAndObjects(@NotNull TopDownAnalysisContext c) {
+        Collection<ClassDescriptor> sourceClasses = (Collection) c.getAllClasses();
+        List<ClassDescriptor> allClassesOrdered = DFS.topologicalOrder(sourceClasses, CLASS_INHERITANCE_EDGES);
+        allClassesOrdered.retainAll(sourceClasses);
+        return (List) allClassesOrdered;
     }
 
     private void detectAndDisconnectLoops(@NotNull TopDownAnalysisContext c) {
-        // Loop detection and disconnection
         List<Runnable> tasks = new ArrayList<Runnable>();
-        for (final MutableClassDescriptorLite klass : c.getClassesTopologicalOrder()) {
+        for (final MutableClassDescriptor klass : c.getClassesTopologicalOrder()) {
             for (final JetType supertype : klass.getSupertypes()) {
                 ClassifierDescriptor supertypeDescriptor = supertype.getConstructor().getDeclarationDescriptor();
-                if (supertypeDescriptor instanceof MutableClassDescriptorLite) {
-                    MutableClassDescriptorLite superclass = (MutableClassDescriptorLite) supertypeDescriptor;
+                if (supertypeDescriptor instanceof ClassDescriptor) {
+                    ClassDescriptor superclass = (ClassDescriptor) supertypeDescriptor;
                     if (isReachable(superclass, klass, new HashSet<ClassDescriptor>())) {
                         tasks.add(new Runnable() {
                             @Override
@@ -268,18 +272,15 @@ public class TypeHierarchyResolver {
         }
     }
 
-    // Temporary. Duplicates logic from LazyClassTypeConstructor.isReachable
-    private static boolean isReachable(MutableClassDescriptorLite from, MutableClassDescriptorLite to, Set<ClassDescriptor> visited) {
+    // TODO: use DFS and copy to LazyClassTypeConstructor.isReachable
+    private static boolean isReachable(
+            @NotNull ClassDescriptor from,
+            @NotNull MutableClassDescriptor to,
+            @NotNull Set<ClassDescriptor> visited
+    ) {
         if (!visited.add(from)) return false;
-        for (JetType supertype : from.getSupertypes()) {
-            TypeConstructor supertypeConstructor = supertype.getConstructor();
-            if (supertypeConstructor.getDeclarationDescriptor() == to) {
-                return true;
-            }
-            ClassifierDescriptor superclass = supertypeConstructor.getDeclarationDescriptor();
-            if (superclass instanceof MutableClassDescriptorLite && isReachable((MutableClassDescriptorLite) superclass, to, visited)) {
-                return true;
-            }
+        for (ClassDescriptor superclass : CLASS_INHERITANCE_EDGES.getNeighbors(from)) {
+            if (superclass == to || isReachable(superclass, to, visited)) return true;
         }
         return false;
     }

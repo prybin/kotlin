@@ -16,8 +16,6 @@
 
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -32,17 +30,7 @@ import java.io.IOException;
 
 public class JetImportDirectiveElementType extends JetStubElementType<PsiJetImportDirectiveStub, JetImportDirective> {
     public JetImportDirectiveElementType(@NotNull @NonNls String debugName) {
-        super(debugName);
-    }
-
-    @Override
-    public JetImportDirective createPsiFromAst(@NotNull ASTNode node) {
-        return new JetImportDirective(node);
-    }
-
-    @Override
-    public JetImportDirective createPsi(@NotNull PsiJetImportDirectiveStub stub) {
-        return new JetImportDirective(stub);
+        super(debugName, JetImportDirective.class, PsiJetImportDirectiveStub.class);
     }
 
     @Override
@@ -65,10 +53,5 @@ public class JetImportDirectiveElementType extends JetStubElementType<PsiJetImpo
         boolean isAllUnder = dataStream.readBoolean();
         StringRef aliasName = dataStream.readName();
         return new PsiJetImportDirectiveStubImpl(parentStub, isAbsoluteInRootPackage, isAllUnder, aliasName);
-    }
-
-    @Override
-    public void indexStub(@NotNull PsiJetImportDirectiveStub stub, @NotNull IndexSink sink) {
-        // do nothing
     }
 }

@@ -44,7 +44,9 @@ public interface JetStubElementTypes {
     JetTypeParameterListElementType TYPE_PARAMETER_LIST = new JetTypeParameterListElementType("TYPE_PARAMETER_LIST");
     JetAnnotationEntryElementType ANNOTATION_ENTRY = new JetAnnotationEntryElementType("ANNOTATION_ENTRY");
 
-    JetAnnotationElementType ANNOTATION = new JetAnnotationElementType("ANNOTATION");
+    JetPlaceHolderStubElementType<JetAnnotation> ANNOTATION =
+            new JetPlaceHolderStubElementType<JetAnnotation>("ANNOTATION", JetAnnotation.class);
+
     JetClassBodyElementType CLASS_BODY = new JetClassBodyElementType("CLASS_BODY");
 
     JetImportListElementType IMPORT_LIST = new JetImportListElementType("IMPORT_LIST");

@@ -16,8 +16,6 @@
 
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -32,17 +30,7 @@ import java.io.IOException;
 
 public class JetNameReferenceExpressionElementType extends JetStubElementType<PsiJetNameReferenceExpressionStub, JetNameReferenceExpression> {
     public JetNameReferenceExpressionElementType(@NotNull @NonNls String debugName) {
-        super(debugName);
-    }
-
-    @Override
-    public JetNameReferenceExpression createPsiFromAst(@NotNull ASTNode node) {
-        return new JetNameReferenceExpression(node);
-    }
-
-    @Override
-    public JetNameReferenceExpression createPsi(@NotNull PsiJetNameReferenceExpressionStub stub) {
-         return new JetNameReferenceExpression(stub);
+        super(debugName, JetNameReferenceExpression.class, PsiJetNameReferenceExpressionStub.class);
     }
 
     @Override
@@ -60,10 +48,5 @@ public class JetNameReferenceExpressionElementType extends JetStubElementType<Ps
     public PsiJetNameReferenceExpressionStub deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         StringRef referencedName = dataStream.readName();
         return new PsiJetNameReferenceExpressionStubImpl(parentStub, referencedName);
-    }
-
-    @Override
-    public void indexStub(@NotNull PsiJetNameReferenceExpressionStub stub, @NotNull IndexSink sink) {
-        //do nothing
     }
 }

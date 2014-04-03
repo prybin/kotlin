@@ -16,7 +16,6 @@
 
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
@@ -35,17 +34,7 @@ import java.io.IOException;
 public class JetAnnotationEntryElementType extends JetStubElementType<PsiJetAnnotationEntryStub, JetAnnotationEntry> {
 
     public JetAnnotationEntryElementType(@NotNull @NonNls String debugName) {
-        super(debugName);
-    }
-
-    @Override
-    public JetAnnotationEntry createPsiFromAst(@NotNull ASTNode node) {
-        return new JetAnnotationEntry(node);
-    }
-
-    @Override
-    public JetAnnotationEntry createPsi(@NotNull PsiJetAnnotationEntryStub stub) {
-        return new JetAnnotationEntry(stub);
+        super(debugName, JetAnnotationEntry.class, PsiJetAnnotationEntryStub.class);
     }
 
     @Override

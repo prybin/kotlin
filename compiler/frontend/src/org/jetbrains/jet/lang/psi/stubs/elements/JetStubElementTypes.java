@@ -62,7 +62,8 @@ public interface JetStubElementTypes {
     JetPlaceHolderStubElementType<JetTypeConstraintList> TYPE_CONSTRAINT_LIST =
             new JetPlaceHolderStubElementType<JetTypeConstraintList>("TYPE_CONSTRAINT_LIST", JetTypeConstraintList.class);
 
-    JetNullableTypeElementType NULLABLE_TYPE = new JetNullableTypeElementType("NULLABLE_TYPE");
+    JetPlaceHolderStubElementType<JetNullableType> NULLABLE_TYPE =
+            new JetPlaceHolderStubElementType<JetNullableType>("NULLABLE_TYPE", JetNullableType.class);
 
     JetTypeReferenceElementType TYPE_REFERENCE = new JetTypeReferenceElementType("TYPE_REFERENCE");
     JetUserTypeElementType USER_TYPE = new JetUserTypeElementType("USER_TYPE");

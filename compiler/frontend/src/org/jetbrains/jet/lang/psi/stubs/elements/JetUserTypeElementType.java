@@ -16,8 +16,6 @@
 
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -31,17 +29,7 @@ import java.io.IOException;
 
 public class JetUserTypeElementType extends JetStubElementType<PsiJetUserTypeStub, JetUserType> {
     public JetUserTypeElementType(@NotNull @NonNls String debugName) {
-        super(debugName);
-    }
-
-    @Override
-    public JetUserType createPsiFromAst(@NotNull ASTNode node) {
-        return new JetUserType(node);
-    }
-
-    @Override
-    public JetUserType createPsi(@NotNull PsiJetUserTypeStub stub) {
-        return new JetUserType(stub);
+        super(debugName, JetUserType.class, PsiJetUserTypeStub.class);
     }
 
     @Override
@@ -59,10 +47,5 @@ public class JetUserTypeElementType extends JetStubElementType<PsiJetUserTypeStu
     public PsiJetUserTypeStub deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         boolean isAbsoluteInRootPackage = dataStream.readBoolean();
         return new PsiJetUserTypeStubImpl(parentStub, isAbsoluteInRootPackage);
-    }
-
-    @Override
-    public void indexStub(@NotNull PsiJetUserTypeStub stub, @NotNull IndexSink sink) {
-        //do nothing
     }
 }

@@ -28,7 +28,7 @@ import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetPlaceHolderStubImpl;
 
 import java.io.IOException;
 
-public abstract class JetPlaceHolderStubElementType<T extends JetElement> extends JetStubElementType<PsiJetPlaceHolderStub<T>, T> {
+public class JetPlaceHolderStubElementType<T extends JetElement> extends JetStubElementType<PsiJetPlaceHolderStub<T>, T> {
 
     public JetPlaceHolderStubElementType(@NotNull @NonNls String debugName, @NotNull Class<T> psiClass) {
         super(debugName, psiClass, PsiJetPlaceHolderStub.class);
@@ -48,10 +48,5 @@ public abstract class JetPlaceHolderStubElementType<T extends JetElement> extend
     @Override
     public PsiJetPlaceHolderStub<T> deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         return new PsiJetPlaceHolderStubImpl<T>(parentStub, this);
-    }
-
-    @Override
-    public void indexStub(@NotNull PsiJetPlaceHolderStub<T> stub, @NotNull IndexSink sink) {
-        //do nothing
     }
 }

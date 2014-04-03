@@ -19,6 +19,7 @@ package org.jetbrains.jet.lang.psi.stubs.elements;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.jet.lang.psi.JetClassInitializer;
 import org.jetbrains.jet.lang.psi.JetClassObject;
+import org.jetbrains.jet.lang.psi.JetParameterList;
 
 public interface JetStubElementTypes {
     JetFileElementType FILE = new JetFileElementType();
@@ -28,13 +29,18 @@ public interface JetStubElementTypes {
     JetPropertyElementType PROPERTY = new JetPropertyElementType("PROPERTY");
     JetClassElementType ENUM_ENTRY = new JetClassElementType("ENUM_ENTRY");
     JetObjectElementType OBJECT_DECLARATION = new JetObjectElementType("OBJECT_DECLARATION");
+
     JetPlaceHolderStubElementType<JetClassObject> CLASS_OBJECT =
             new JetPlaceHolderStubElementType<JetClassObject>("CLASS_OBJECT", JetClassObject.class);
+
     JetPlaceHolderStubElementType<JetClassInitializer> ANONYMOUS_INITIALIZER =
             new JetPlaceHolderStubElementType<JetClassInitializer>("ANONYMOUS_INITIALIZER", JetClassInitializer.class);
+
     JetParameterElementType VALUE_PARAMETER = new JetParameterElementType("VALUE_PARAMETER");
 
-    JetParameterListElementType VALUE_PARAMETER_LIST = new JetParameterListElementType("VALUE_PARAMETER_LIST");
+    JetPlaceHolderStubElementType<JetParameterList> VALUE_PARAMETER_LIST =
+            new JetPlaceHolderStubElementType<JetParameterList>("VALUE_PARAMETER_LIST", JetParameterList.class);
+
     JetTypeParameterElementType TYPE_PARAMETER = new JetTypeParameterElementType("TYPE_PARAMETER");
 
     JetTypeParameterListElementType TYPE_PARAMETER_LIST = new JetTypeParameterListElementType("TYPE_PARAMETER_LIST");

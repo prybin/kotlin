@@ -47,7 +47,8 @@ public interface JetStubElementTypes {
     JetPlaceHolderStubElementType<JetAnnotation> ANNOTATION =
             new JetPlaceHolderStubElementType<JetAnnotation>("ANNOTATION", JetAnnotation.class);
 
-    JetClassBodyElementType CLASS_BODY = new JetClassBodyElementType("CLASS_BODY");
+    JetPlaceHolderStubElementType<JetClassBody> CLASS_BODY =
+            new JetPlaceHolderStubElementType<JetClassBody>("CLASS_BODY", JetClassBody.class);
 
     JetImportListElementType IMPORT_LIST = new JetImportListElementType("IMPORT_LIST");
     JetImportDirectiveElementType IMPORT_DIRECTIVE = new JetImportDirectiveElementType("IMPORT_DIRECTIVE");

@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.psi.JetClass;
 import org.jetbrains.jet.lang.psi.JetEnumEntry;
-import org.jetbrains.jet.lang.psi.JetPsiUtil;
 import org.jetbrains.jet.lang.psi.psiUtil.PsiUtilPackage;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetClassStub;
 import org.jetbrains.jet.lang.psi.stubs.impl.PsiJetClassStubImpl;
@@ -39,14 +38,16 @@ import java.util.List;
 
 public class JetClassElementType extends JetStubElementType<PsiJetClassStub, JetClass> {
     public JetClassElementType(@NotNull @NonNls String debugName) {
-        super(debugName);
+        super(debugName, JetClass.class, PsiJetClassStub.class);
     }
 
+    @NotNull
     @Override
     public JetClass createPsi(@NotNull PsiJetClassStub stub) {
         return !stub.isEnumEntry() ? new JetClass(stub) : new JetEnumEntry(stub);
     }
 
+    @NotNull
     @Override
     public JetClass createPsiFromAst(@NotNull ASTNode node) {
         return node.getElementType() != JetStubElementTypes.ENUM_ENTRY ? new JetClass(node) : new JetEnumEntry(node);

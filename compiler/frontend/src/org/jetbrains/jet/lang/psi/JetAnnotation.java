@@ -17,7 +17,6 @@
 package org.jetbrains.jet.lang.psi;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.util.ArrayFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.JetNodeTypes;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetPlaceHolderStub;
@@ -26,15 +25,6 @@ import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
 import java.util.List;
 
 public class JetAnnotation extends JetElementImplStub<PsiJetPlaceHolderStub<JetAnnotation>> {
-    public static final JetAnnotation[] EMPTY_ARRAY = new JetAnnotation[0];
-
-    public static final ArrayFactory<JetAnnotation> ARRAY_FACTORY = new ArrayFactory<JetAnnotation>() {
-        @NotNull
-        @Override
-        public JetAnnotation[] create(int count) {
-            return count == 0 ? EMPTY_ARRAY : new JetAnnotation[count];
-        }
-    };
 
     public JetAnnotation(@NotNull ASTNode node) {
         super(node);

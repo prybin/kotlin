@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetPlaceHolderStub;
 import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class JetTypeArgumentList extends JetElementImplStub<PsiJetPlaceHolderStub<JetTypeArgumentList>> {
@@ -40,6 +39,6 @@ public class JetTypeArgumentList extends JetElementImplStub<PsiJetPlaceHolderStu
 
     @NotNull
     public List<JetTypeProjection> getArguments() {
-        return Arrays.asList(getStubOrPsiChildren(JetStubElementTypes.TYPE_PROJECTION, JetTypeProjection.ARRAY_FACTORY));
+        return getStubOrPsiChildrenAsList(JetStubElementTypes.TYPE_PROJECTION);
     }
 }

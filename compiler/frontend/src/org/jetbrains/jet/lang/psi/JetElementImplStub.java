@@ -24,7 +24,11 @@ import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementType;
 import org.jetbrains.jet.plugin.JetLanguage;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class JetElementImplStub<T extends StubElement> extends StubBasedPsiElementBase<T>
         implements JetElement, StubBasedPsiElement<T> {
@@ -84,5 +88,12 @@ public class JetElementImplStub<T extends StubElement> extends StubBasedPsiEleme
     @Override
     public PsiReference[] getReferences() {
         return ReferenceProvidersRegistry.getReferencesFromProviders(this, PsiReferenceService.Hints.NO_HINTS);
+    }
+
+    @NotNull
+    protected <PsiT extends JetElement, StubT extends StubElement> List<PsiT> getStubOrPsiChildrenAsList(
+            @NotNull JetStubElementType<StubT, PsiT> elementType
+    ) {
+        return Arrays.asList(getStubOrPsiChildren(elementType, elementType.getArrayFactory()));
     }
 }

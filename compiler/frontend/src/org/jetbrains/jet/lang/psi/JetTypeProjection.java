@@ -18,7 +18,6 @@ package org.jetbrains.jet.lang.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.ArrayFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.psi.stubs.PsiJetTypeProjectionStub;
@@ -26,15 +25,6 @@ import org.jetbrains.jet.lang.psi.stubs.elements.JetStubElementTypes;
 import org.jetbrains.jet.lexer.JetTokens;
 
 public class JetTypeProjection extends JetModifierListOwnerStub<PsiJetTypeProjectionStub> {
-    public static final JetTypeProjection[] EMPTY_ARRAY = new JetTypeProjection[0];
-
-    public static final ArrayFactory<JetTypeProjection> ARRAY_FACTORY = new ArrayFactory<JetTypeProjection>() {
-        @NotNull
-        @Override
-        public JetTypeProjection[] create(int count) {
-            return count == 0 ? EMPTY_ARRAY : new JetTypeProjection[count];
-        }
-    };
 
     public JetTypeProjection(@NotNull ASTNode node) {
         super(node);

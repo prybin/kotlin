@@ -58,7 +58,9 @@ public interface JetStubElementTypes {
     JetDeclarationModifierListElementType MODIFIER_LIST = new JetDeclarationModifierListElementType("MODIFIER_LIST");
 
     JetPrimaryConstructorModifierListElementType PRIMARY_CONSTRUCTOR_MODIFIER_LIST = new JetPrimaryConstructorModifierListElementType("PRIMARY_CONSTRUCTOR_MODIFIER_LIST");
-    JetTypeConstraintListElementType TYPE_CONSTRAINT_LIST = new JetTypeConstraintListElementType("TYPE_CONSTRAINT_LIST");
+
+    JetPlaceHolderStubElementType<JetTypeConstraintList> TYPE_CONSTRAINT_LIST =
+            new JetPlaceHolderStubElementType<JetTypeConstraintList>("TYPE_CONSTRAINT_LIST", JetTypeConstraintList.class);
 
     JetNullableTypeElementType NULLABLE_TYPE = new JetNullableTypeElementType("NULLABLE_TYPE");
 

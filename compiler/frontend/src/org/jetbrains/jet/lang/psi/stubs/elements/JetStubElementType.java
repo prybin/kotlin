@@ -21,18 +21,42 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.ReflectionUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.plugin.JetLanguage;
 
+import java.lang.reflect.Constructor;
+
 public abstract class JetStubElementType<StubT extends StubElement, PsiT extends PsiElement> extends IStubElementType<StubT, PsiT> {
 
-    public JetStubElementType(@NotNull @NonNls String debugName) {
+    @NotNull
+    private final Constructor<PsiT> byNodeConstructor;
+    @NotNull
+    private final Constructor<PsiT> byStubConstructor;
+
+    public JetStubElementType(@NotNull @NonNls String debugName, @NotNull Class<PsiT> psiClass, @NotNull Class<?> stubClass) {
         super(debugName, JetLanguage.INSTANCE);
+        try {
+            byNodeConstructor = psiClass.getConstructor(ASTNode.class);
+            byStubConstructor = psiClass.getConstructor(stubClass);
+        }
+        catch (NoSuchMethodException e) {
+            throw new RuntimeException("Stub element type declaration for " + psiClass.getSimpleName() + " is missing required constructors",e);
+        }
     }
 
-    public abstract PsiT createPsiFromAst(@NotNull ASTNode node);
+    @NotNull
+    public PsiT createPsiFromAst(@NotNull ASTNode node) {
+        return ReflectionUtil.createInstance(byNodeConstructor, node);
+    }
+
+    @Override
+    @NotNull
+    public PsiT createPsi(@NotNull StubT stub) {
+        return ReflectionUtil.createInstance(byStubConstructor, stub);
+    }
 
     @NotNull
     @Override

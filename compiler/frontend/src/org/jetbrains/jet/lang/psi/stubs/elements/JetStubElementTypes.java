@@ -20,6 +20,7 @@ import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.jet.lang.psi.JetClassInitializer;
 import org.jetbrains.jet.lang.psi.JetClassObject;
 import org.jetbrains.jet.lang.psi.JetParameterList;
+import org.jetbrains.jet.lang.psi.JetTypeArgumentList;
 
 public interface JetStubElementTypes {
     JetFileElementType FILE = new JetFileElementType();
@@ -66,7 +67,9 @@ public interface JetStubElementTypes {
     JetNameReferenceExpressionElementType REFERENCE_EXPRESSION = new JetNameReferenceExpressionElementType("REFERENCE_EXPRESSION");
 
     JetDotQualifiedExpressionElementType DOT_QUALIFIED_EXPRESSION = new JetDotQualifiedExpressionElementType("DOT_QUALIFIED_EXPRESSION");
-    JetTypeArgumentListElementType TYPE_ARGUMENT_LIST = new JetTypeArgumentListElementType("TYPE_ARGUMENT_LIST");
+
+    JetPlaceHolderStubElementType<JetTypeArgumentList> TYPE_ARGUMENT_LIST =
+            new JetPlaceHolderStubElementType<JetTypeArgumentList>("TYPE_ARGUMENT_LIST", JetTypeArgumentList.class);
 
     JetDelegationSpecifierListElementType DELEGATION_SPECIFIER_LIST = new JetDelegationSpecifierListElementType("DELEGATION_SPECIFIER_LIST");
 

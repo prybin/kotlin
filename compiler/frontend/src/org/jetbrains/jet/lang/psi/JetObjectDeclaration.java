@@ -106,7 +106,7 @@ public class JetObjectDeclaration extends JetNamedDeclarationStub<PsiJetObjectSt
         if (!isClassObject()) {
             return null;
         }
-        return (JetClassObject) getParent();
+        return (JetClassObject) getParentByStub();
     }
 
     @Override

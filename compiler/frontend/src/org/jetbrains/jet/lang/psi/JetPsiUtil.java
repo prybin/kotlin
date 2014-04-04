@@ -322,7 +322,7 @@ public class JetPsiUtil {
     public static void deleteClass(@NotNull JetClassOrObject clazz) {
         CheckUtil.checkWritable(clazz);
         JetFile file = (JetFile) clazz.getContainingFile();
-        if (isLocal(clazz) || file.getDeclarations().size() > 1) {
+        if (clazz.isLocal() || file.getDeclarations().size() > 1) {
             PsiElement parent = clazz.getParent();
             CodeEditUtil.removeChild(parent.getNode(), clazz.getNode());
         }

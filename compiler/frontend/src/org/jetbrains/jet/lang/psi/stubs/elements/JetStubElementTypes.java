@@ -17,6 +17,7 @@
 package org.jetbrains.jet.lang.psi.stubs.elements;
 
 import com.intellij.psi.tree.TokenSet;
+import org.jetbrains.jet.JetNodeType;
 import org.jetbrains.jet.lang.psi.*;
 
 public interface JetStubElementTypes {
@@ -96,6 +97,9 @@ public interface JetStubElementTypes {
             new JetPlaceHolderStubElementType<JetDelegatorToSuperClass>("DELEGATOR_SUPER_CLASS", JetDelegatorToSuperClass.class);
     JetPlaceHolderStubElementType<JetDelegatorToThisCall> THIS_CALL =
             new JetPlaceHolderStubElementType<JetDelegatorToThisCall>("THIS_CALL", JetDelegatorToThisCall.class);
+
+    JetPlaceHolderStubElementType<JetConstructorCalleeExpression> CONSTRUCTOR_CALLEE =
+            new JetPlaceHolderStubElementType<JetConstructorCalleeExpression>("CONSTRUCTOR_CALLEE", JetConstructorCalleeExpression.class);
 
     TokenSet DECLARATION_TYPES =
             TokenSet.create(CLASS, OBJECT_DECLARATION, CLASS_OBJECT, FUNCTION, PROPERTY, ANONYMOUS_INITIALIZER, ENUM_ENTRY);

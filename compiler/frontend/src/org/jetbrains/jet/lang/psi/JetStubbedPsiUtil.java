@@ -29,12 +29,18 @@ public final class JetStubbedPsiUtil {
     }
 
     @Nullable
+    public static <T extends JetDeclaration> T getContainingDeclaration(@NotNull PsiElement element, @NotNull Class<T> declarationClass) {
+        return getContainingDeclaration(element, declarationClass, true);
+    }
+
+    @Nullable
     public static <T extends JetDeclaration> T getContainingDeclaration(
             @NotNull PsiElement element,
-            Class<T> declarationClass,
+            @NotNull Class<T> declarationClass,
             boolean strict
     ) {
         if (!strict && declarationClass.isInstance(element)) {
+            //noinspection unchecked
             return (T) element;
         }
         if (element instanceof JetElementImplStub) {

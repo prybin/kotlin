@@ -24,12 +24,12 @@ import org.jetbrains.annotations.Nullable;
 
 public final class JetStubbedPsiUtil {
     @Nullable
-    public static JetDeclaration getContainingDeclarationElement(@NotNull PsiElement element) {
-        return getContainingDeclarationElement(element, JetDeclaration.class, true);
+    public static JetDeclaration getContainingDeclaration(@NotNull PsiElement element) {
+        return getContainingDeclaration(element, JetDeclaration.class, true);
     }
 
     @Nullable
-    public static <T extends JetDeclaration> T getContainingDeclarationElement(
+    public static <T extends JetDeclaration> T getContainingDeclaration(
             @NotNull PsiElement element,
             Class<T> declarationClass,
             boolean strict

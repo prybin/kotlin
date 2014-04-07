@@ -98,11 +98,13 @@ public abstract class ClassBodyCodegen extends MemberCodegen {
             }
         }
 
-        for (DeclarationDescriptor memberDescriptor : descriptor.getDefaultType().getMemberScope().getAllDescriptors()) {
-            if (memberDescriptor instanceof FunctionDescriptor) {
-                FunctionDescriptor member = (FunctionDescriptor) memberDescriptor;
-                if (member.getKind() == CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
-                    functionCodegen.generateBridges(member);
+        if (state.getClassBuilderMode() == ClassBuilderMode.FULL) {
+            for (DeclarationDescriptor memberDescriptor : descriptor.getDefaultType().getMemberScope().getAllDescriptors()) {
+                if (memberDescriptor instanceof FunctionDescriptor) {
+                    FunctionDescriptor member = (FunctionDescriptor) memberDescriptor;
+                    if (member.getKind() == CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
+                        functionCodegen.generateBridges(member);
+                    }
                 }
             }
         }

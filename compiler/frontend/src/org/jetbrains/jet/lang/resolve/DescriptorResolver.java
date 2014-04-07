@@ -1442,7 +1442,7 @@ public class DescriptorResolver {
             @NotNull JetParameter parameter
     ) {
         // If is not a property, then it must have no modifier
-        if (parameter.getValOrVarNode() == null) {
+        if (!parameter.hasValOrVarNode()) {
             checkParameterHasNoModifier(trace, parameter);
         }
     }

@@ -125,7 +125,7 @@ public abstract class ClassBodyCodegen extends MemberCodegen {
     private void generatePrimaryConstructorProperties(PropertyCodegen propertyCodegen, JetClassOrObject origin) {
         boolean isAnnotation = origin instanceof JetClass && ((JetClass) origin).isAnnotation();
         for (JetParameter p : getPrimaryConstructorParameters()) {
-            if (p.getValOrVarNode() != null) {
+            if (p.hasValOrVarNode()) {
                 PropertyDescriptor propertyDescriptor = state.getBindingContext().get(BindingContext.PRIMARY_CONSTRUCTOR_PARAMETER, p);
                 if (propertyDescriptor != null) {
                     if (!isAnnotation) {

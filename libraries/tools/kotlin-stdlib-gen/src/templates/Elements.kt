@@ -15,7 +15,7 @@ fun elements(): List<GenericFunction> {
             return indexOf(element) >= 0
             """
         }
-        exclude(Lists, Collections)
+        exclude(Strings, Lists, Collections)
         body(ArraysOfPrimitives, ArraysOfObjects) {
             """
             return indexOf(element) >= 0
@@ -24,6 +24,7 @@ fun elements(): List<GenericFunction> {
     }
 
     templates add f("indexOf(element: T)") {
+        exclude(Strings)
         doc { "Returns first index of *element*, or -1 if the collection does not contain element" }
         returns("Int")
         body {
@@ -69,6 +70,7 @@ fun elements(): List<GenericFunction> {
     }
 
     templates add f("lastIndexOf(element: T)") {
+        exclude(Strings) // has native implementation
         doc { "Returns last index of *element*, or -1 if the collection does not contain element" }
         returns("Int")
         body {
@@ -143,7 +145,7 @@ fun elements(): List<GenericFunction> {
             throw IndexOutOfBoundsException("Collection doesn't contain element at index")
             """
         }
-        body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
+        body(Strings, Lists, ArraysOfObjects, ArraysOfPrimitives) {
             """
             return get(index)
             """
@@ -161,7 +163,7 @@ fun elements(): List<GenericFunction> {
             return iterator.next()
             """
         }
-        body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
+        body(Strings, Lists, ArraysOfObjects, ArraysOfPrimitives) {
             """
             if (size == 0)
                 throw IllegalArgumentException("Collection is empty")
@@ -180,7 +182,7 @@ fun elements(): List<GenericFunction> {
             return iterator.next()
             """
         }
-        body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
+        body(Strings, Lists, ArraysOfObjects, ArraysOfPrimitives) {
             """
             return if (size > 0) this[0] else null
             """
@@ -232,7 +234,7 @@ fun elements(): List<GenericFunction> {
             }
             """
         }
-        body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
+        body(Strings, Lists, ArraysOfObjects, ArraysOfPrimitives) {
             """
             if (size == 0)
                 throw IllegalArgumentException("Collection is empty")
@@ -260,8 +262,7 @@ fun elements(): List<GenericFunction> {
             }
             """
         }
-        include(Lists)
-        body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
+        body(Strings, Lists, ArraysOfObjects, ArraysOfPrimitives) {
             """
             return if (size > 0) this[size - 1] else null
             """
@@ -338,7 +339,7 @@ fun elements(): List<GenericFunction> {
             }
             """
         }
-        body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
+        body(Strings, Lists, ArraysOfObjects, ArraysOfPrimitives) {
             """
             if (size != 1)
                 throw IllegalArgumentException("Collection has ${bucks}size elements")
@@ -366,7 +367,7 @@ fun elements(): List<GenericFunction> {
             }
             """
         }
-        body(Lists, ArraysOfObjects, ArraysOfPrimitives) {
+        body(Strings, Lists, ArraysOfObjects, ArraysOfPrimitives) {
             """
             if (size == 0)
                 return null

@@ -106,7 +106,7 @@ public class OverloadResolver {
         }
 
         for (Map.Entry<FqNameUnsafe, Collection<CallableMemberDescriptor>> e : functionsByName.entrySet()) {
-            checkOverloadsWithSameName(e.getValue(), e.getKey().parent().asString());
+            checkOverloadsWithSameName(e.getValue(), e.getKey().parent().toString());
         }
     }
 

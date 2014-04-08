@@ -18,6 +18,7 @@ package org.jetbrains.jet.plugin.highlighter;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
@@ -59,6 +60,17 @@ public class IdeRenderers {
     public static String strong(Object o, boolean error) {
         return String.format(error ? RED_TEMPLATE : STRONG_TEMPLATE, o);
     }
+
+    public static final Renderer<Object> HTML_TO_STRING = new Renderer<Object>() {
+        private final String[] searchList = new String[] {"&", "\"", "<", ">"};
+        private final String[] replacementList = new String[] {"&amp;", "&quot;", "&lt;", "&gt;"};
+
+        @NotNull
+        @Override
+        public String render(@NotNull Object object) {
+            return StringUtils.replaceEach(object.toString(), searchList, replacementList);
+        }
+    };
 
     public static final Renderer<Collection<? extends ResolvedCall<?>>> HTML_AMBIGUOUS_CALLS =
             new Renderer<Collection<? extends ResolvedCall<?>>>() {

@@ -990,8 +990,7 @@ public class DescriptorResolver {
 
         boolean hasDelegate = variable instanceof JetProperty && ((JetProperty) variable).hasDelegateExpression();
         if (propertyTypeRef == null) {
-            final JetExpression initializer = variable.getInitializer();
-            if (initializer == null) {
+            if (!variable.hasInitializer()) {
                 if (hasDelegate && variableDescriptor instanceof PropertyDescriptor) {
                     final JetProperty property = (JetProperty) variable;
                     final JetExpression propertyDelegateExpression = property.getDelegateExpression();
@@ -1021,7 +1020,7 @@ public class DescriptorResolver {
                             new Function0<JetType>() {
                                 @Override
                                 public JetType invoke() {
-                                    JetType initializerType = resolveInitializerType(scope, initializer, dataFlowInfo, trace);
+                                    JetType initializerType = resolveInitializerType(scope, variable.getInitializer(), dataFlowInfo, trace);
                                     setConstantForVariableIfNeeded(variableDescriptor, scope, variable, dataFlowInfo, initializerType, trace);
                                     return transformAnonymousTypeIfNeeded(variableDescriptor, variable, initializerType, trace);
                                 }
@@ -1029,7 +1028,7 @@ public class DescriptorResolver {
                     );
                 }
                 else {
-                    JetType initializerType = resolveInitializerType(scope, initializer, dataFlowInfo, trace);
+                    JetType initializerType = resolveInitializerType(scope, variable.getInitializer(), dataFlowInfo, trace);
                     setConstantForVariableIfNeeded(variableDescriptor, scope, variable, dataFlowInfo, initializerType, trace);
                     return initializerType;
                 }

@@ -144,7 +144,7 @@ public class AnnotationResolver {
                 );
             }
             if (shouldResolveArguments) {
-                resolveAnnotationArguments(entryElement, scope, trace);
+                resolveAnnotationArguments(entryElement, trace);
             }
 
             result.add(descriptor);
@@ -198,27 +198,26 @@ public class AnnotationResolver {
         );
     }
 
-    public void resolveAnnotationsArguments(@NotNull JetScope scope, @Nullable JetModifierList modifierList, @NotNull BindingTrace trace) {
+    public void resolveAnnotationsArguments(@Nullable JetModifierList modifierList, @NotNull BindingTrace trace) {
         if (modifierList == null) {
             return;
         }
 
         for (JetAnnotationEntry annotationEntry : modifierList.getAnnotationEntries()) {
-            resolveAnnotationArguments(annotationEntry, scope, trace);
+            resolveAnnotationArguments(annotationEntry, trace);
         }
     }
 
-    public void resolveAnnotationsArguments(@NotNull Annotated descriptor, @NotNull BindingTrace trace, @NotNull JetScope scope) {
+    public void resolveAnnotationsArguments(@NotNull Annotated descriptor, @NotNull BindingTrace trace) {
         for (AnnotationDescriptor annotationDescriptor : descriptor.getAnnotations()) {
             JetAnnotationEntry annotationEntry = trace.getBindingContext().get(ANNOTATION_DESCRIPTOR_TO_PSI_ELEMENT, annotationDescriptor);
             assert annotationEntry != null : "Cannot find annotation entry: " + annotationDescriptor;
-            resolveAnnotationArguments(annotationEntry, scope, trace);
+            resolveAnnotationArguments(annotationEntry, trace);
         }
     }
 
     private static void resolveAnnotationArguments(
             @NotNull JetAnnotationEntry annotationEntry,
-            @NotNull JetScope scope,
             @NotNull BindingTrace trace
     ) {
         AnnotationDescriptor annotationDescriptor = trace.getBindingContext().get(BindingContext.ANNOTATION, annotationEntry);

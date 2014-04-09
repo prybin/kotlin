@@ -84,6 +84,20 @@ public class JetProperty extends JetTypeParameterListOwnerStub<PsiJetPropertyStu
     @Override
     @Nullable
     public JetTypeReference getReceiverTypeRef() {
+        PsiJetPropertyStub stub = getStub();
+        if (stub != null) {
+            if (!stub.hasReceiverTypeRef()) {
+                return null;
+            }
+            else {
+                return getStubOrPsiChild(JetStubElementTypes.TYPE_REFERENCE);
+            }
+        }
+        return getReceiverTypeRefByTree();
+    }
+
+    @Nullable
+    private JetTypeReference getReceiverTypeRefByTree() {
         ASTNode node = getNode().getFirstChildNode();
         while (node != null) {
             IElementType tt = node.getElementType();
@@ -107,6 +121,23 @@ public class JetProperty extends JetTypeParameterListOwnerStub<PsiJetPropertyStu
     @Override
     @Nullable
     public JetTypeReference getTypeRef() {
+        PsiJetPropertyStub stub = getStub();
+        if (stub != null) {
+            if (!stub.hasReturnTypeRef()) {
+                return null;
+            }
+            else {
+                //TODO: log failure
+                List<JetTypeReference> typeReferences = getStubOrPsiChildrenAsList(JetStubElementTypes.TYPE_REFERENCE);
+                int returnTypeRefPositionInPsi = stub.hasReceiverTypeRef() ? 1 : 0;
+                return typeReferences.get(returnTypeRefPositionInPsi);
+            }
+        }
+        return getTypeRefByTree();
+    }
+
+    @Nullable
+    private JetTypeReference getTypeRefByTree() {
         ASTNode node = getNode().getFirstChildNode();
         boolean passedColon = false;
         while (node != null) {

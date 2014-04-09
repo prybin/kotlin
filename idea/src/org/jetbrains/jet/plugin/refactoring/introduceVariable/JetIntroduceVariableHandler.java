@@ -116,8 +116,7 @@ public class JetIntroduceVariableHandler extends JetIntroduceHandlerBase {
                 return;
             }
         }
-        ResolveSessionForBodies resolveSession =
-                AnalyzerFacadeWithCache.getLazyResolveSessionForFile((JetFile) expression.getContainingFile());
+        ResolveSessionForBodies resolveSession = AnalyzerFacadeWithCache.getLazyResolveSessionForFile(expression.getContainingFile());
         BindingContext bindingContext = resolveSession.resolveToElement(expression);
         final JetType expressionType = bindingContext.get(BindingContext.EXPRESSION_TYPE, expression); //can be null or error type
         JetScope scope = bindingContext.get(BindingContext.RESOLUTION_SCOPE, expression);

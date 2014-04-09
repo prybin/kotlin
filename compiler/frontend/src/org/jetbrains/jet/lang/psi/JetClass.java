@@ -21,7 +21,6 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.ItemPresentationProviders;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
@@ -196,9 +195,8 @@ public class JetClass extends JetTypeParameterListOwnerStub<PsiJetClassStub> imp
             parts.add(current.getName());
             current = PsiTreeUtil.getParentOfType(current, JetClassOrObject.class);
         }
-        PsiFile file = getContainingFile();
-        if (!(file instanceof JetFile)) return null;
-        String fileQualifiedName = ((JetFile) file).getPackageFqName().asString();
+        JetFile file = getContainingFile();
+        String fileQualifiedName = file.getPackageFqName().asString();
         if (!fileQualifiedName.isEmpty()) {
             parts.add(fileQualifiedName);
         }

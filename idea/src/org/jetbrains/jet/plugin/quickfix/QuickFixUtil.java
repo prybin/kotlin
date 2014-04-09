@@ -19,7 +19,6 @@ package org.jetbrains.jet.plugin.quickfix;
 import com.google.common.collect.Sets;
 import com.intellij.extapi.psi.ASTDelegatePsiElement;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
@@ -61,9 +60,7 @@ public class QuickFixUtil {
 
     @Nullable
     public static JetType getDeclarationReturnType(JetNamedDeclaration declaration) {
-        PsiFile file = declaration.getContainingFile();
-        if (!(file instanceof JetFile)) return null;
-        BindingContext bindingContext = AnalyzerFacadeWithCache.analyzeFileWithCache((JetFile) file).getBindingContext();
+        BindingContext bindingContext = AnalyzerFacadeWithCache.analyzeFileWithCache(declaration.getContainingFile()).getBindingContext();
         DeclarationDescriptor descriptor = bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, declaration);
         if (!(descriptor instanceof CallableDescriptor)) return null;
         JetType type = ((CallableDescriptor) descriptor).getReturnType();
@@ -102,7 +99,7 @@ public class QuickFixUtil {
 
     @Nullable
     public static JetParameterList getParameterListOfCallee(@NotNull JetCallExpression callExpression) {
-        BindingContext context = AnalyzerFacadeWithCache.analyzeFileWithCache((JetFile) callExpression.getContainingFile()).getBindingContext();
+        BindingContext context = AnalyzerFacadeWithCache.analyzeFileWithCache(callExpression.getContainingFile()).getBindingContext();
         ResolvedCall<?> resolvedCall = context.get(BindingContext.RESOLVED_CALL, callExpression.getCalleeExpression());
         if (resolvedCall == null) return null;
         PsiElement declaration = BindingContextUtils.descriptorToDeclaration(context, resolvedCall.getCandidateDescriptor());

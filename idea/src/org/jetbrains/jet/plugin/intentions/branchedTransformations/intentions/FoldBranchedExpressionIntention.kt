@@ -21,7 +21,6 @@ import org.jetbrains.jet.plugin.intentions.JetSelfTargetingIntention
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.BranchedFoldingUtils
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.FoldableKind
 import com.intellij.openapi.editor.Editor
-import org.jetbrains.jet.lang.psi.JetFile
 import org.jetbrains.jet.lang.psi.JetIfExpression
 import org.jetbrains.jet.lang.psi.JetWhenExpression
 
@@ -31,10 +30,7 @@ public open class FoldBranchedExpressionIntention<T: JetExpression>(
     override fun isApplicableTo(element: T): Boolean = BranchedFoldingUtils.getFoldableExpressionKind(element) == kind
 
     override fun applyTo(element: T, editor: Editor) {
-        val file = element.getContainingFile()
-        if (file is JetFile) {
-            kind.transform(element, editor, file)
-        }
+        kind.transform(element, editor, element.getContainingFile())
     }
 }
 

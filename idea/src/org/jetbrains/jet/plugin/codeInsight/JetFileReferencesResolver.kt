@@ -28,7 +28,6 @@ import org.jetbrains.jet.lang.psi.JetDotQualifiedExpression
 import org.jetbrains.jet.lang.psi.JetExpression
 import org.jetbrains.jet.lang.psi.JetCallExpression
 import org.jetbrains.jet.lang.psi.JetSimpleNameExpression
-import java.util.Collections
 
 object JetFileReferencesResolver {
     fun resolve(
@@ -36,9 +35,7 @@ object JetFileReferencesResolver {
             visitReceivers: Boolean = true,
             visitShortNames: Boolean = true
     ): Map<JetReferenceExpression, BindingContext> {
-        return (element.getContainingFile() as? JetFile)?.let { file ->
-            resolve(file, listOf(element), visitReceivers, visitShortNames)
-        } ?: Collections.emptyMap()
+        return resolve(element.getContainingFile(), listOf(element), visitReceivers, visitShortNames)
     }
 
     fun resolve(

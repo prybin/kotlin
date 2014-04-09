@@ -20,7 +20,6 @@ import org.jetbrains.jet.lang.psi.JetExpression
 import org.jetbrains.jet.plugin.intentions.branchedTransformations.*
 import org.jetbrains.jet.plugin.intentions.JetSelfTargetingIntention
 import com.intellij.openapi.editor.Editor
-import org.jetbrains.jet.lang.psi.JetFile
 import org.jetbrains.jet.lang.psi.JetBinaryExpression
 import org.jetbrains.jet.lang.psi.JetReturnExpression
 import org.jetbrains.jet.lang.psi.JetProperty
@@ -31,10 +30,7 @@ public open class UnfoldBranchedExpressionIntention<T: JetExpression>(
     override fun isApplicableTo(element: T): Boolean = BranchedUnfoldingUtils.getUnfoldableExpressionKind(element) == kind
 
     override fun applyTo(element: T, editor: Editor) {
-        val file = element.getContainingFile()
-        if (file is JetFile) {
-            kind.transform(element, editor, file)
-        }
+        kind.transform(element, editor, element.getContainingFile())
     }
 }
 

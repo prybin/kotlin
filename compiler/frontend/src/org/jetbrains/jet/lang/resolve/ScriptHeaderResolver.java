@@ -22,7 +22,6 @@ import org.jetbrains.jet.lang.descriptors.PackageFragmentDescriptor;
 import org.jetbrains.jet.lang.descriptors.ScriptDescriptor;
 import org.jetbrains.jet.lang.descriptors.ScriptDescriptorImpl;
 import org.jetbrains.jet.lang.descriptors.ValueParameterDescriptor;
-import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.psi.JetScript;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.name.Name;
@@ -64,8 +63,7 @@ public class ScriptHeaderResolver {
 
 
     public void processScriptHierarchy(@NotNull TopDownAnalysisContext c, @NotNull JetScript script, @NotNull WritableScope outerScope) {
-        JetFile file = (JetFile) script.getContainingFile();
-        FqName fqName = file.getPackageFqName();
+        FqName fqName = script.getContainingFile().getPackageFqName();
         PackageFragmentDescriptor ns = packageFragmentProvider.getOrCreateFragment(fqName);
 
         Integer priority = getScriptPriority(script);

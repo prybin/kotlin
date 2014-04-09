@@ -18,7 +18,6 @@ package org.jetbrains.jet.asJava;
 
 import com.google.common.collect.Sets;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.jet.cli.jvm.compiler.CliLightClassGenerationSupport;
 import org.jetbrains.jet.lang.psi.JetFile;
@@ -52,7 +51,7 @@ public class JavaElementFinderMultiFileTest extends KotlinAsJavaTestBase {
                 CliLightClassGenerationSupport.getInstanceForCli(getProject()).findFilesForPackage(new FqName("test"), searchScope)
         );
 
-        Set<PsiFile> actualFiles = Sets.newHashSet();
+        Set<JetFile> actualFiles = Sets.newHashSet();
         for (int i = 1; i < classes.length; i++) {
             assertInstanceOf(classes[i], FakeLightClassForFileOfPackage.class);
             actualFiles.add(((FakeLightClassForFileOfPackage) classes[i]).getContainingFile());

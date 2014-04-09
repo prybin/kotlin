@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.psi.JetDeclaration;
-import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
 import org.jetbrains.jet.lang.resolve.lazy.declarations.PackageMemberDeclarationProvider;
@@ -55,7 +54,7 @@ public class LazyPackageMemberScope extends AbstractLazyMemberScope<PackageFragm
     @NotNull
     @Override
     protected JetScope getScopeForMemberDeclarationResolution(JetDeclaration declaration) {
-        return resolveSession.getScopeProvider().getFileScope((JetFile) declaration.getContainingFile());
+        return resolveSession.getScopeProvider().getFileScope(declaration.getContainingFile());
     }
 
     @Override

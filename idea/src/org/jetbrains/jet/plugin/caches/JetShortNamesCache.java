@@ -22,7 +22,10 @@ import com.google.common.collect.Sets;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.util.ArrayUtil;
@@ -256,11 +259,7 @@ public class JetShortNamesCache extends PsiShortNamesCache {
         Collection<JetNamedFunction> jetNamedFunctions =
                 JetTopLevelNonExtensionFunctionShortNameIndex.getInstance().get(referenceName.asString(), project, scope);
         for (JetNamedFunction jetNamedFunction : jetNamedFunctions) {
-            PsiFile containingFile = jetNamedFunction.getContainingFile();
-            if (containingFile instanceof JetFile) {
-                JetFile jetFile = (JetFile) containingFile;
-                affectedPackages.add(jetFile.getPackageFqName());
-            }
+            affectedPackages.add(jetNamedFunction.getContainingFile().getPackageFqName());
         }
 
         for (FqName affectedPackage : affectedPackages) {

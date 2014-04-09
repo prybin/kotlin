@@ -17,10 +17,11 @@
 package org.jetbrains.jet.lang.resolve.lazy.data;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jet.lang.psi.*;
+import org.jetbrains.jet.lang.psi.JetClassOrObject;
+import org.jetbrains.jet.lang.psi.JetDeclaration;
+import org.jetbrains.jet.lang.psi.JetModifierList;
 import org.jetbrains.jet.lang.resolve.name.FqName;
 
 import java.util.List;
@@ -58,12 +59,7 @@ public abstract class JetClassOrObjectInfo<E extends JetClassOrObject> implement
     @NotNull
     @Override
     public FqName getContainingPackageFqName() {
-        PsiFile file = element.getContainingFile();
-        if (file instanceof JetFile) {
-            JetFile jetFile = (JetFile) file;
-            return jetFile.getPackageFqName();
-        }
-        throw new IllegalArgumentException("Not in a JetFile: " + element);
+        return element.getContainingFile().getPackageFqName();
     }
 
     @Override

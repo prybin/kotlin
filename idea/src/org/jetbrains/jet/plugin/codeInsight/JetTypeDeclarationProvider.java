@@ -31,7 +31,7 @@ import org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache;
 public class JetTypeDeclarationProvider implements TypeDeclarationProvider {
     @Override
     public PsiElement[] getSymbolTypeDeclarations(PsiElement symbol) {
-        if (symbol instanceof JetElement && symbol.getContainingFile() instanceof JetFile) {
+        if (symbol instanceof JetElement) {
             BindingContext bindingContext =
                     AnalyzerFacadeWithCache.analyzeFileWithCache((JetFile) symbol.getContainingFile()).getBindingContext();
             DeclarationDescriptor descriptor = bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, symbol);

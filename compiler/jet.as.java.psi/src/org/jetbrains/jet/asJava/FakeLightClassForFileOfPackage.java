@@ -18,7 +18,6 @@ package org.jetbrains.jet.asJava;
 
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.light.AbstractLightClass;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +54,7 @@ import org.jetbrains.jet.lang.resolve.name.FqName;
     }
 
     @Override
-    public PsiFile getContainingFile() {
+    public JetFile getContainingFile() {
         return file;
     }
 

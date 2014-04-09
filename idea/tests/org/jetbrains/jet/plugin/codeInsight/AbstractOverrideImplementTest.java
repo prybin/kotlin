@@ -29,20 +29,19 @@ import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.intellij.util.SmartList;
 import kotlin.Function1;
-import junit.framework.Assert;
 import kotlin.KotlinPackage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.CallableMemberDescriptor;
 import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
 import org.jetbrains.jet.lang.psi.JetClassOrObject;
-import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.OverridingUtil;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 import org.jetbrains.jet.plugin.JetLightProjectDescriptor;
 import org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache;
 import org.jetbrains.jet.plugin.project.ResolveSessionForBodies;
+import org.junit.Assert;
 
 import java.util.*;
 
@@ -122,8 +121,8 @@ public abstract class AbstractOverrideImplementTest extends LightCodeInsightFixt
         final JetClassOrObject classOrObject = PsiTreeUtil.getParentOfType(elementAtCaret, JetClassOrObject.class);
         assertNotNull("Caret should be inside class or object", classOrObject);
 
-        final JetFile jetFile = (JetFile) classOrObject.getContainingFile();
-        final ResolveSessionForBodies resolveSession = AnalyzerFacadeWithCache.getLazyResolveSessionForFile(jetFile);
+        final ResolveSessionForBodies resolveSession =
+                AnalyzerFacadeWithCache.getLazyResolveSessionForFile(classOrObject.getContainingFile());
         Set<CallableMemberDescriptor> descriptors =
                 handler.collectMethodsToGenerate(classOrObject, resolveSession.resolveToElement(classOrObject));
 
@@ -163,11 +162,14 @@ public abstract class AbstractOverrideImplementTest extends LightCodeInsightFixt
 
         new WriteCommandAction(myFixture.getProject(), myFixture.getFile()) {
             @Override
-            protected void run(Result result) throws Throwable {
+            protected void run(@NotNull Result result) throws Throwable {
                 OverrideImplementMethodsHandler.generateMethods(
                         myFixture.getEditor(), classOrObject,
-                        OverrideImplementMethodsHandler
-                                .membersFromDescriptors(jetFile, Collections.singletonList(singleToOverride), resolveSession.getBindingContext()));
+                        OverrideImplementMethodsHandler.membersFromDescriptors(
+                                classOrObject.getContainingFile(), Collections.singletonList(singleToOverride),
+                                resolveSession.getBindingContext()
+                        )
+                );
             }
         }.execute();
     }
@@ -177,7 +179,6 @@ public abstract class AbstractOverrideImplementTest extends LightCodeInsightFixt
         final JetClassOrObject classOrObject = PsiTreeUtil.getParentOfType(elementAtCaret, JetClassOrObject.class);
         assertNotNull("Caret should be inside class or object", classOrObject);
 
-        final JetFile jetFile = (JetFile) classOrObject.getContainingFile();
         final BindingContext bindingContext = AnalyzerFacadeWithCache.getContextForElement(classOrObject);
         Set<CallableMemberDescriptor> descriptors = handler.collectMethodsToGenerate(classOrObject, bindingContext);
 
@@ -191,10 +192,13 @@ public abstract class AbstractOverrideImplementTest extends LightCodeInsightFixt
 
         new WriteCommandAction(myFixture.getProject(), myFixture.getFile()) {
             @Override
-            protected void run(Result result) throws Throwable {
+            protected void run(@NotNull Result result) throws Throwable {
                 OverrideImplementMethodsHandler.generateMethods(
                         myFixture.getEditor(), classOrObject,
-                        OverrideImplementMethodsHandler.membersFromDescriptors(jetFile, descriptorsList, bindingContext));
+                        OverrideImplementMethodsHandler.membersFromDescriptors(
+                                classOrObject.getContainingFile(), descriptorsList, bindingContext
+                        )
+                );
             }
         }.execute();
     }

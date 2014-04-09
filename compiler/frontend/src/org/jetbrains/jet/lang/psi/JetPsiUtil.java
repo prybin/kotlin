@@ -39,7 +39,6 @@ import org.jetbrains.jet.lang.parsing.JetExpressionParsing;
 import org.jetbrains.jet.lang.psi.psiUtil.PsiUtilPackage;
 import org.jetbrains.jet.lang.resolve.ImportPath;
 import org.jetbrains.jet.lang.resolve.name.FqName;
-import org.jetbrains.jet.lang.resolve.name.FqNameUnsafe;
 import org.jetbrains.jet.lang.resolve.name.Name;
 import org.jetbrains.jet.lang.resolve.name.SpecialNames;
 import org.jetbrains.jet.lang.types.expressions.OperatorConventions;
@@ -321,7 +320,7 @@ public class JetPsiUtil {
 
     public static void deleteClass(@NotNull JetClassOrObject clazz) {
         CheckUtil.checkWritable(clazz);
-        JetFile file = (JetFile) clazz.getContainingFile();
+        JetFile file = clazz.getContainingFile();
         if (isLocal(clazz) || file.getDeclarations().size() > 1) {
             PsiElement parent = clazz.getParent();
             CodeEditUtil.removeChild(parent.getNode(), clazz.getNode());
@@ -912,7 +911,7 @@ public class JetPsiUtil {
 
     @Nullable
     public static String getPackageName(@NotNull JetElement element) {
-        JetFile file = (JetFile) element.getContainingFile();
+        JetFile file = element.getContainingFile();
         JetPackageDirective header = PsiTreeUtil.findChildOfType(file, JetPackageDirective.class);
 
         return header != null ? header.getQualifiedName() : null;

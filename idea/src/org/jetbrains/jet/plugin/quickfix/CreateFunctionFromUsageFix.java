@@ -737,9 +737,7 @@ public class CreateFunctionFromUsageFix extends CreateFromUsageFixBase {
         else { // create as regular function
             String functionText = String.format("fun %s(%s)%s { }", functionName, parametersString, returnTypeString);
             func = JetPsiFactory.createFunction(project, functionText);
-            PsiFile classContainingFile = ownerClass.getContainingFile();
-            assert classContainingFile instanceof JetFile;
-            containingFile = (JetFile) classContainingFile;
+            containingFile = ownerClass.getContainingFile();
 
             NavigationUtil.activateFileWithPsiElement(containingFile);
             containingFileEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();

@@ -20,10 +20,7 @@ import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.FileASTNode;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.psi.FileViewProvider;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiClassOwner;
-import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -148,6 +145,14 @@ public class JetFile extends PsiFileBase implements JetDeclarationContainer, Jet
     @Override
     public String getName() {
         return super.getName(); // TODO
+    }
+
+    @Override
+    @NotNull
+    public JetFile getContainingFile() {
+        PsiFile file = super.getContainingFile();
+        assert file instanceof JetFile : "File for " + this + " is not a JetFile: " + file.getClass().getName() + "\n" + file.getText();
+        return (JetFile) file;
     }
 
     @Override

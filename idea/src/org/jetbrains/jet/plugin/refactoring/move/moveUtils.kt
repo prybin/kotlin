@@ -24,13 +24,9 @@ import org.jetbrains.jet.lang.resolve.DescriptorUtils
 import org.jetbrains.jet.lang.descriptors.PackageFragmentDescriptor
 import org.jetbrains.jet.plugin.references.JetSimpleNameReference
 import org.jetbrains.jet.lang.resolve.name.FqName
-import org.jetbrains.jet.lang.psi.JetFile
 import org.jetbrains.jet.lang.psi.JetElement
 import org.jetbrains.jet.plugin.references.JetSimpleNameReference.ShorteningMode
-import com.intellij.psi.PsiClass
-import org.jetbrains.jet.asJava.KotlinLightClass
 import org.jetbrains.jet.plugin.JetFileType
-import org.jetbrains.jet.lang.psi.JetClassOrObject
 import org.jetbrains.jet.lang.psi.JetNamedDeclaration
 
 public class PackageNameInfo(val oldPackageName: FqName, val newPackageName: FqName)
@@ -38,10 +34,7 @@ public class PackageNameInfo(val oldPackageName: FqName, val newPackageName: FqN
 public fun JetElement.updateInternalReferencesOnPackageNameChange(
         packageNameInfo: PackageNameInfo, shorteningMode: ShorteningMode = ShorteningMode.DELAYED_SHORTENING
 ) {
-    val file = getContainingFile() as? JetFile
-    if (file == null) return
-
-    val referenceToContext = JetFileReferencesResolver.resolve(file = file, elements = listOf(this), visitReceivers = false)
+    val referenceToContext = JetFileReferencesResolver.resolve(file = getContainingFile(), elements = listOf(this), visitReceivers = false)
 
     for ((refExpr, bindingContext) in referenceToContext) {
         if (refExpr !is JetSimpleNameExpression) continue
@@ -67,7 +60,6 @@ public fun JetElement.updateInternalReferencesOnPackageNameChange(
 }
 
 public fun JetNamedDeclaration.getFileNameAfterMove(): String? {
-    return (getContainingFile() as? JetFile)?.let { file ->
-        if (file.getDeclarations().size > 1) "${getName()}.${JetFileType.INSTANCE.getDefaultExtension()}" else file.getName()
-    }
+    val file = getContainingFile()
+    return if (file.getDeclarations().size > 1) "${getName()}.${JetFileType.INSTANCE.getDefaultExtension()}" else file.getName()
 }

@@ -29,7 +29,6 @@ import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.testFramework.LightVirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.org.objectweb.asm.Type;
 import org.jetbrains.jet.OutputFile;
 import org.jetbrains.jet.analyzer.AnalyzeExhaust;
 import org.jetbrains.jet.cli.common.arguments.CompilerArgumentsUtil;
@@ -63,6 +62,7 @@ import org.jetbrains.jet.plugin.JetLanguage;
 import org.jetbrains.jet.storage.ExceptionTracker;
 import org.jetbrains.jet.storage.LockBasedStorageManager;
 import org.jetbrains.jet.utils.UtilsPackage;
+import org.jetbrains.org.objectweb.asm.Type;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -370,9 +370,10 @@ public class ReplInterpreter {
         state.beforeCompile();
         KotlinCodegenFacade.generatePackage(
                 state,
-                ((JetFile) script.getContainingFile()).getPackageFqName(),
-                Collections.singleton((JetFile) script.getContainingFile()),
-                errorHandler);
+                script.getContainingFile().getPackageFqName(),
+                Collections.singleton(script.getContainingFile()),
+                errorHandler
+        );
     }
 
 }

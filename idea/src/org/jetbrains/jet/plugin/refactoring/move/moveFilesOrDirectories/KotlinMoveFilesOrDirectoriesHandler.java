@@ -21,21 +21,21 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectoriesHandler;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.psi.JetClassOrObject;
 import org.jetbrains.jet.lang.psi.JetDeclaration;
 import org.jetbrains.jet.lang.psi.JetFile;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class KotlinMoveFilesOrDirectoriesHandler extends MoveFilesOrDirectoriesHandler {
-    public static boolean isMovableClass(JetClassOrObject clazz) {
+    public static boolean isMovableClass(@NotNull JetClassOrObject clazz) {
         if (!(clazz.getParent() instanceof JetFile)) return false;
-        JetFile file = (JetFile) clazz.getContainingFile();
-        List<JetDeclaration> declarations = file.getDeclarations();
-        for (JetDeclaration declaration : declarations) {
-            if (declaration instanceof JetClassOrObject && declaration != clazz) return false;
+        for (JetDeclaration declaration : clazz.getContainingFile().getDeclarations()) {
+            if (declaration instanceof JetClassOrObject && declaration != clazz) {
+                return false;
+            }
         }
         return true;
     }
@@ -60,8 +60,8 @@ public class KotlinMoveFilesOrDirectoriesHandler extends MoveFilesOrDirectoriesH
     }
 
     @Override
-    public PsiElement[] adjustForMove(Project project, PsiElement[] sourceElements, PsiElement targetElement) {
-        ArrayList<PsiElement> result = new ArrayList<PsiElement>();
+    public PsiElement[] adjustForMove(@NotNull Project project, @NotNull PsiElement[] sourceElements, PsiElement targetElement) {
+        ArrayList<PsiElement> result = new ArrayList<PsiElement>(sourceElements.length);
         for (PsiElement element : sourceElements) {
             if (element instanceof JetClassOrObject) {
                 result.add(element.getContainingFile());

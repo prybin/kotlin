@@ -16,8 +16,6 @@
 
 package org.jetbrains.jet.plugin.refactoring.introduceVariable;
 
-import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
-import com.intellij.codeInsight.template.impl.TemplateState;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
@@ -29,12 +27,13 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.refactoring.introduce.inplace.InplaceVariableIntroducer;
 import com.intellij.ui.NonFocusableCheckBox;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.psi.JetExpression;
+import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.psi.JetProperty;
 import org.jetbrains.jet.lang.types.JetType;
 import org.jetbrains.jet.lexer.JetTokens;
@@ -79,10 +78,10 @@ public class JetInplaceVariableIntroducer extends InplaceVariableIntroducer<JetE
             myVarCheckbox.setMnemonic('v');
             myVarCheckbox.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(@NotNull ActionEvent e) {
                     new WriteCommandAction(myProject, getCommandName(), getCommandName()) {
                         @Override
-                        protected void run(Result result) throws Throwable {
+                        protected void run(@NotNull Result result) throws Throwable {
                             PsiDocumentManager.getInstance(myProject).commitDocument(myEditor.getDocument());
                             JetChangePropertyActions.declareValueOrVariable(myProject, myVarCheckbox.isSelected(),
                                                                             myProperty);
@@ -98,11 +97,11 @@ public class JetInplaceVariableIntroducer extends InplaceVariableIntroducer<JetE
             myExprTypeCheckbox.setMnemonic('t');
             myExprTypeCheckbox.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(@NotNull ActionEvent e) {
                     final Ref<Boolean> greedyToRight = new Ref<Boolean>();
                     new WriteCommandAction(myProject, getCommandName(), getCommandName()) {
                         @Override
-                        protected void run(Result result) throws Throwable {
+                        protected void run(@NotNull Result result) throws Throwable {
                             PsiDocumentManager.getInstance(myProject).commitDocument(myEditor.getDocument());
                             if (myExprTypeCheckbox.isSelected()) {
                                 ASTNode identifier = myProperty.getNode().findChildByType(JetTokens.IDENTIFIER);
@@ -179,7 +178,7 @@ public class JetInplaceVariableIntroducer extends InplaceVariableIntroducer<JetE
         }
         else {
             int startOffset = myExprMarker.getStartOffset();
-            PsiFile file = myProperty.getContainingFile();
+            JetFile file = myProperty.getContainingFile();
             PsiElement elementAt = file.findElementAt(startOffset);
             if (elementAt != null) {
                 myEditor.getCaretModel().moveToOffset(elementAt.getTextRange().getEndOffset());

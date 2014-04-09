@@ -20,6 +20,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceService;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
@@ -40,6 +41,14 @@ public class JetElementImpl extends ASTWrapperPsiElement implements JetElement {
     @Override
     public String toString() {
         return getNode().getElementType().toString();
+    }
+
+    @Override
+    @NotNull
+    public JetFile getContainingFile() {
+        PsiFile file = super.getContainingFile();
+        assert file instanceof JetFile : "File for " + this + " is not a JetFile: " + file.getClass().getName() + "\n" + file.getText();
+        return (JetFile) file;
     }
 
     @Override

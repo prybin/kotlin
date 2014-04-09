@@ -380,7 +380,7 @@ public class JetFunctionParameterInfoHandler implements ParameterInfoHandlerWith
         }
 
         ResolveSessionForBodies resolveSession =
-                AnalyzerFacadeWithCache.getLazyResolveSessionForFile((JetFile) callNameExpression.getContainingFile());
+                AnalyzerFacadeWithCache.getLazyResolveSessionForFile(callNameExpression.getContainingFile());
         BindingContext bindingContext = resolveSession.resolveToElement(callNameExpression);
 
         JetScope scope = bindingContext.get(BindingContext.RESOLUTION_SCOPE, callNameExpression);

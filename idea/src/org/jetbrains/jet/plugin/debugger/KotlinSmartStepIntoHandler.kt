@@ -38,8 +38,6 @@ import com.intellij.debugger.engine.BasicStepMethodFilter
 import com.intellij.debugger.engine.DebugProcessImpl
 import com.sun.jdi.Location
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiFile
-import com.intellij.openapi.editor.Editor
 
 public class KotlinSmartStepIntoHandler : JvmSmartStepIntoHandler() {
 
@@ -195,7 +193,6 @@ public class KotlinSmartStepIntoHandler : JvmSmartStepIntoHandler() {
             if (super.locationMatches(process, location)) return true
 
             val containingFile = stepTarget.resolvedElement.getContainingFile()
-            if (containingFile !is JetFile) return false
 
             val positionManager = process.getPositionManager()
             if (positionManager == null) return false

@@ -27,11 +27,6 @@ import com.intellij.util.Function;
 import com.intellij.util.containers.Stack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.org.objectweb.asm.Label;
-import org.jetbrains.org.objectweb.asm.MethodVisitor;
-import org.jetbrains.org.objectweb.asm.Type;
-import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter;
-import org.jetbrains.org.objectweb.asm.commons.Method;
 import org.jetbrains.jet.codegen.binding.CalculatedClosure;
 import org.jetbrains.jet.codegen.binding.CodegenBinding;
 import org.jetbrains.jet.codegen.binding.MutableClosure;
@@ -63,10 +58,14 @@ import org.jetbrains.jet.lang.types.checker.JetTypeChecker;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
 import org.jetbrains.jet.lexer.JetTokens;
 import org.jetbrains.jet.renderer.DescriptorRenderer;
+import org.jetbrains.org.objectweb.asm.Label;
+import org.jetbrains.org.objectweb.asm.MethodVisitor;
+import org.jetbrains.org.objectweb.asm.Type;
+import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter;
+import org.jetbrains.org.objectweb.asm.commons.Method;
 
 import java.util.*;
 
-import static org.jetbrains.org.objectweb.asm.Opcodes.*;
 import static org.jetbrains.jet.codegen.AsmUtil.*;
 import static org.jetbrains.jet.codegen.CodegenUtil.*;
 import static org.jetbrains.jet.codegen.FunctionTypesUtil.functionTypeToImpl;
@@ -78,6 +77,7 @@ import static org.jetbrains.jet.lang.resolve.BindingContextUtils.isVarCapturedIn
 import static org.jetbrains.jet.lang.resolve.java.AsmTypeConstants.*;
 import static org.jetbrains.jet.lang.resolve.java.JvmAnnotationNames.KotlinSyntheticClass;
 import static org.jetbrains.jet.lang.resolve.scopes.receivers.ReceiverValue.NO_RECEIVER;
+import static org.jetbrains.org.objectweb.asm.Opcodes.*;
 
 public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implements LocalLookup, ParentCodegenAware {
     private static final Set<DeclarationDescriptor> INTEGRAL_RANGES = KotlinBuiltIns.getInstance().getIntegralRanges();
@@ -1960,7 +1960,7 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                               KotlinSyntheticClass.Kind.SAM_LAMBDA);
         }
 
-        Type asmType = state.getSamWrapperClasses().getSamWrapperClass(samInterface, (JetFile) expression.getContainingFile());
+        Type asmType = state.getSamWrapperClasses().getSamWrapperClass(samInterface, expression.getContainingFile());
 
         v.anew(asmType);
         v.dup();

@@ -24,7 +24,6 @@ import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.org.objectweb.asm.Type;
 import org.jetbrains.jet.OutputFile;
 import org.jetbrains.jet.OutputFileCollection;
 import org.jetbrains.jet.codegen.state.GenerationState;
@@ -32,6 +31,7 @@ import org.jetbrains.jet.codegen.state.GenerationStateAware;
 import org.jetbrains.jet.lang.descriptors.ClassDescriptor;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.resolve.name.FqName;
+import org.jetbrains.org.objectweb.asm.Type;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -129,28 +129,30 @@ public final class ClassFileFactory extends GenerationStateAware implements Outp
         return codegen;
     }
 
-    public ClassBuilder forClassImplementation(ClassDescriptor aClass, PsiFile sourceFile) {
-        Type type = state.getTypeMapper().mapClass(aClass);
+    @NotNull
+    public ClassBuilder forClassImplementation(@NotNull ClassDescriptor descriptor, @NotNull JetFile sourceFile) {
+        Type type = state.getTypeMapper().mapClass(descriptor);
         if (isPrimitive(type)) {
-            throw new IllegalStateException("Codegen for primitive type is not possible: " + aClass);
+            throw new IllegalStateException("Codegen for primitive type is not possible: " + descriptor);
         }
         return newVisitor(type, sourceFile);
     }
 
-    public ClassBuilder forLambdaInlining(Type lambaType, PsiFile sourceFile) {
-        if (isPrimitive(lambaType)) {
-            throw new IllegalStateException("Codegen for primitive type is not possible: " + lambaType);
+    @NotNull
+    public ClassBuilder forLambdaInlining(@NotNull Type lambdaType, @NotNull PsiFile sourceFile) {
+        if (isPrimitive(lambdaType)) {
+            throw new IllegalStateException("Codegen for primitive type is not possible: " + lambdaType);
         }
-        return newVisitor(lambaType, sourceFile);
+        return newVisitor(lambdaType, sourceFile);
     }
 
     @NotNull
-    public ClassBuilder forPackagePart(@NotNull Type asmType, @NotNull PsiFile sourceFile) {
+    public ClassBuilder forPackagePart(@NotNull Type asmType, @NotNull JetFile sourceFile) {
         return newVisitor(asmType, sourceFile);
     }
 
     @NotNull
-    public ClassBuilder forTraitImplementation(@NotNull ClassDescriptor aClass, @NotNull GenerationState state, @NotNull PsiFile file) {
+    public ClassBuilder forTraitImplementation(@NotNull ClassDescriptor aClass, @NotNull GenerationState state, @NotNull JetFile file) {
         return newVisitor(state.getTypeMapper().mapTraitImpl(aClass), file);
     }
 

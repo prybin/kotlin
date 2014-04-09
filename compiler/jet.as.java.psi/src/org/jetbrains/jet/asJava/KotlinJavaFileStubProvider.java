@@ -53,7 +53,6 @@ import org.jetbrains.jet.lang.psi.JetPsiUtil;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.BindingContextUtils;
 import org.jetbrains.jet.lang.resolve.name.FqName;
-import org.jetbrains.jet.lang.types.lang.InlineUtil;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -123,10 +122,6 @@ public class KotlinJavaFileStubProvider<T extends WithFileStub> implements Cache
                 classOrObject.getProject(),
                 JetPsiUtil.isLocal(classOrObject),
                 new StubGenerationStrategy<OutermostKotlinClassLightClassData>() {
-                    private JetFile getFile() {
-                        return (JetFile) classOrObject.getContainingFile();
-                    }
-
                     @NotNull
                     @Override
                     public LightClassConstructionContext getContext(@NotNull Collection<JetFile> files) {
@@ -175,13 +170,13 @@ public class KotlinJavaFileStubProvider<T extends WithFileStub> implements Cache
                     @NotNull
                     @Override
                     public Collection<JetFile> getFiles() {
-                        return Collections.singletonList(getFile());
+                        return Collections.singletonList(classOrObject.getContainingFile());
                     }
 
                     @NotNull
                     @Override
                     public FqName getPackageFqName() {
-                        return getFile().getPackageFqName();
+                        return classOrObject.getContainingFile().getPackageFqName();
                     }
 
                     @Override

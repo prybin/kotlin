@@ -60,7 +60,6 @@ import org.jetbrains.jet.lang.psi.JetTypeReference
 import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.jet.lang.diagnostics.DiagnosticUtils
 import org.jetbrains.jet.plugin.imports.*
-import org.jetbrains.jet.lang.descriptors.PackageViewDescriptor
 import org.jetbrains.jet.utils.*
 
 //NOTE: this class is based on CopyPasteReferenceProcessor and JavaCopyPasteReferenceProcessor
@@ -333,7 +332,7 @@ public class KotlinCopyPasteReferenceProcessor() : CopyPastePostProcessor<Refere
             else if (parent is JetUserType) {
                 val typeReference = PsiTreeUtil.getParentOfType(expression, javaClass<JetTypeReference>())
                 LOG.assertTrue(typeReference != null, "JetUserType is expected to have parent of type JetTypeReference:\n" +
-                    "At: ${DiagnosticUtils.atLocation(expression)}\nFILE:\n${expression.getContainingFile()!!.getText()}")
+                    "At: ${DiagnosticUtils.atLocation(expression)}\nFILE:\n${expression.getContainingFile().getText()}")
                 typeReference!!.replace(JetPsiFactory.createType(project, "$prefixToInsert.${typeReference.getText()}"))
             }
             else {

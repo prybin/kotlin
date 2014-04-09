@@ -38,8 +38,6 @@ import com.intellij.psi.PsiDirectory
 import org.jetbrains.jet.lang.psi.psiUtil.getPackage
 import org.jetbrains.jet.lang.psi.JetFile
 import org.jetbrains.jet.plugin.refactoring.move.PackageNameInfo
-import org.jetbrains.jet.lang.psi.JetPsiUtil
-import org.jetbrains.jet.lang.resolve.name.FqName
 import org.jetbrains.jet.plugin.refactoring.createKotlinFile
 import org.jetbrains.jet.plugin.refactoring.move.updateInternalReferencesOnPackageNameChange
 import org.jetbrains.jet.plugin.codeInsight.addToShorteningWaitSet
@@ -194,7 +192,7 @@ public class MoveKotlinTopLevelDeclarationsProcessor(project: Project, val optio
 
                     if (!declarationToReferenceTargets.getOrPut(declaration) { HashSet<PsiElement>() }.add(refTarget)) continue
 
-                    val currentPackage = declaration.getContainingFile()?.getContainingDirectory()?.getPackage()
+                    val currentPackage = declaration.getContainingFile().getContainingDirectory()?.getPackage()
                     if (currentPackage?.getQualifiedName() == newPackageName) continue
 
                     conflicts.putValue(
@@ -221,13 +219,11 @@ public class MoveKotlinTopLevelDeclarationsProcessor(project: Project, val optio
 
     override fun performRefactoring(usages: Array<out UsageInfo>?) {
         fun moveDeclaration(declaration: JetNamedDeclaration, moveTarget: KotlinMoveTarget): JetNamedDeclaration? {
-            val file = declaration.getContainingFile() as? JetFile
-            assert (file != null, "${declaration.getClass()}: ${declaration.getText()}")
-
+            val file = declaration.getContainingFile()
             val targetPsi = moveTarget.getOrCreateTargetPsi(declaration)
             val targetFile =
                     if (targetPsi is PsiDirectory) {
-                        val existingFile = if (targetPsi != file!!.getContainingDirectory()) targetPsi.findFile(file.getName()) else null
+                        val existingFile = if (targetPsi != file.getContainingDirectory()) targetPsi.findFile(file.getName()) else null
                         val newFile = existingFile ?: declaration.getFileNameAfterMove()?.let {
                             fileName ->
                             createKotlinFile(fileName, targetPsi)
@@ -241,7 +237,7 @@ public class MoveKotlinTopLevelDeclarationsProcessor(project: Project, val optio
 
             val newPackageFqName = (targetFile as JetFile).getPackageFqName()
 
-            val packageNameInfo = PackageNameInfo(file!!.getPackageFqName(), newPackageFqName)
+            val packageNameInfo = PackageNameInfo(file.getPackageFqName(), newPackageFqName)
             declaration.updateInternalReferencesOnPackageNameChange(packageNameInfo, ShorteningMode.NO_SHORTENING)
 
             val newElement = targetFile.add(declaration) as JetNamedDeclaration

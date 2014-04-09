@@ -32,7 +32,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.lang.descriptors.*;
-import org.jetbrains.jet.lang.descriptors.impl.MutableClassDescriptor;
 import org.jetbrains.jet.lang.psi.*;
 import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.types.JetType;
@@ -94,8 +93,7 @@ public abstract class OverrideImplementMethodsHandler implements LanguageCodeIns
         }
 
         List<JetElement> elementsToCompact = new ArrayList<JetElement>();
-        JetFile file = (JetFile) classOrObject.getContainingFile();
-        for (JetElement element : generateOverridingMembers(selectedElements, file)) {
+        for (JetElement element : generateOverridingMembers(selectedElements, classOrObject.getContainingFile())) {
             PsiElement added = body.addAfter(element, afterAnchor);
             afterAnchor = added;
             elementsToCompact.add((JetElement) added);

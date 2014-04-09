@@ -25,13 +25,11 @@ import com.intellij.codeInsight.template.TemplateEditingAdapter;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jet.JetNodeTypes;
 import org.jetbrains.jet.lang.descriptors.ClassifierDescriptor;
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
 import org.jetbrains.jet.lang.descriptors.SimpleFunctionDescriptor;
@@ -50,7 +48,6 @@ import org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache;
 import org.jetbrains.jet.renderer.DescriptorRenderer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -143,7 +140,7 @@ public class SpecifyTypeExplicitlyAction extends PsiElementBaseIntentionAction {
 
 
     private static boolean hasPublicMemberDiagnostic(@NotNull JetNamedDeclaration declaration) {
-        BindingContext bindingContext = AnalyzerFacadeWithCache.analyzeFileWithCache((JetFile) declaration.getContainingFile()).getBindingContext();
+        BindingContext bindingContext = AnalyzerFacadeWithCache.analyzeFileWithCache(declaration.getContainingFile()).getBindingContext();
         for (Diagnostic diagnostic : bindingContext.getDiagnostics()) {
             //noinspection ConstantConditions
             if (Errors.PUBLIC_MEMBER_SHOULD_SPECIFY_TYPE == diagnostic.getFactory() && declaration == diagnostic.getPsiElement()) {
@@ -155,7 +152,7 @@ public class SpecifyTypeExplicitlyAction extends PsiElementBaseIntentionAction {
 
     @NotNull
     public static JetType getTypeForDeclaration(@NotNull JetNamedDeclaration declaration) {
-        BindingContext bindingContext = AnalyzerFacadeWithCache.analyzeFileWithCache((JetFile) declaration.getContainingFile()).getBindingContext();
+        BindingContext bindingContext = AnalyzerFacadeWithCache.analyzeFileWithCache(declaration.getContainingFile()).getBindingContext();
         DeclarationDescriptor descriptor = bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, declaration);
 
         JetType type;

@@ -52,8 +52,8 @@ import org.jetbrains.jet.plugin.JetBundle;
 import org.jetbrains.jet.plugin.actions.JetAddImportAction;
 import org.jetbrains.jet.plugin.caches.JetShortNamesCache;
 import org.jetbrains.jet.plugin.project.AnalyzerFacadeWithCache;
-import org.jetbrains.jet.plugin.project.ResolveSessionForBodies;
 import org.jetbrains.jet.plugin.project.ProjectStructureUtil;
+import org.jetbrains.jet.plugin.project.ResolveSessionForBodies;
 import org.jetbrains.jet.plugin.util.JetPsiHeuristicsUtil;
 
 import java.util.Collection;
@@ -65,8 +65,6 @@ import java.util.Set;
  * Check possibility and perform fix for unresolved references.
  */
 public class AutoImportFix extends JetHintAction<JetSimpleNameExpression> implements HighPriorityAction {
-
-    @NotNull
     private final Collection<FqName> suggestions;
 
     public AutoImportFix(@NotNull JetSimpleNameExpression element) {
@@ -74,11 +72,9 @@ public class AutoImportFix extends JetHintAction<JetSimpleNameExpression> implem
         suggestions = computeSuggestions(element);
     }
 
+    @NotNull
     private static Collection<FqName> computeSuggestions(@NotNull JetSimpleNameExpression element) {
-        final PsiFile file = element.getContainingFile();
-        if (!(file instanceof JetFile)) {
-            return Collections.emptyList();
-        }
+        final JetFile file = element.getContainingFile();
 
         String referenceName = element.getReferencedName();
         if (element.getIdentifier() == null) {
@@ -92,12 +88,11 @@ public class AutoImportFix extends JetHintAction<JetSimpleNameExpression> implem
             return Collections.emptyList();
         }
 
-        ResolveSessionForBodies resolveSessionForBodies =
-                AnalyzerFacadeWithCache.getLazyResolveSessionForFile((JetFile) element.getContainingFile());
+        ResolveSessionForBodies resolveSessionForBodies = AnalyzerFacadeWithCache.getLazyResolveSessionForFile(element.getContainingFile());
 
         List<FqName> result = Lists.newArrayList();
         if (!isSuppressedTopLevelImportInPosition(element)) {
-            result.addAll(getClassNames(referenceName, (JetFile) file, resolveSessionForBodies));
+            result.addAll(getClassNames(referenceName, file, resolveSessionForBodies));
             result.addAll(getJetTopLevelFunctions(referenceName, element, resolveSessionForBodies, file.getProject()));
         }
 
@@ -107,7 +102,7 @@ public class AutoImportFix extends JetHintAction<JetSimpleNameExpression> implem
             @Override
             public boolean apply(@Nullable FqName fqName) {
                 assert fqName != null;
-                return ImportInsertHelper.needImport(new ImportPath(fqName, false), (JetFile) file);
+                return ImportInsertHelper.needImport(new ImportPath(fqName, false), file);
             }
         });
     }

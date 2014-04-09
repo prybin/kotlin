@@ -235,6 +235,7 @@ public class BuiltInsReferenceResolver extends AbstractProjectComponent {
     }
 
     public static boolean isFromBuiltIns(@NotNull PsiElement element) {
+        //noinspection SuspiciousMethodCalls
         return element.getProject().getComponent(BuiltInsReferenceResolver.class).builtInsSources.contains(element.getContainingFile());
     }
 

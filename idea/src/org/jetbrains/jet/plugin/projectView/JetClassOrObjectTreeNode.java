@@ -24,7 +24,6 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.jet.lang.psi.JetClassOrObject;
-import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.psi.JetPsiUtil;
 import org.jetbrains.jet.plugin.JetIconProvider;
 
@@ -59,7 +58,7 @@ public class JetClassOrObjectTreeNode extends AbstractPsiBasedNode<JetClassOrObj
             data.setPresentableText(classOrObject.getName());
 
             AbstractTreeNode parent = getParent();
-            if (JetIconProvider.getMainClass((JetFile) classOrObject.getContainingFile()) != null) {
+            if (JetIconProvider.getMainClass(classOrObject.getContainingFile()) != null) {
                 if (parent instanceof JetFileTreeNode) {
                     update(parent.getParent());
                 }

@@ -22,6 +22,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import kotlin.Function1;
 import kotlin.KotlinPackage;
 import org.jetbrains.annotations.NotNull;
@@ -365,7 +366,7 @@ public class TopDownAnalyzer {
                 new TopDownAnalysisParameters(
                         globalContext.getStorageManager(),
                         globalContext.getExceptionTracker(),
-                        Predicates.equalTo(object.getContainingFile()),
+                        Predicates.<PsiFile>equalTo(object.getContainingFile()),
                         false,
                         true
                 );

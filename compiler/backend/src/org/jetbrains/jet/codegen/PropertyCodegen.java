@@ -151,7 +151,7 @@ public class PropertyCodegen extends GenerationStateAware {
         if (Boolean.TRUE.equals(bindingContext.get(BindingContext.BACKING_FIELD_REQUIRED, descriptor))) {
             fv = generateBackingFieldAccess(p, descriptor);
         }
-        else if (p instanceof JetProperty && ((JetProperty) p).getDelegateExpression() != null) {
+        else if (p instanceof JetProperty && ((JetProperty) p).hasDelegate()) {
             fv = generatePropertyDelegateAccess((JetProperty) p, descriptor);
         }
         else {
@@ -269,7 +269,7 @@ public class PropertyCodegen extends GenerationStateAware {
         if (kind != OwnerKind.TRAIT_IMPL || !defaultGetter) {
             FunctionGenerationStrategy strategy;
             if (defaultGetter) {
-                if (p instanceof JetProperty && ((JetProperty) p).getDelegateExpression() != null) {
+                if (p instanceof JetProperty && ((JetProperty) p).hasDelegate()) {
                     strategy = new DefaultPropertyWithDelegateAccessorStrategy(state, getterDescriptor);
                 }
                 else {
@@ -299,7 +299,7 @@ public class PropertyCodegen extends GenerationStateAware {
             if (kind != OwnerKind.TRAIT_IMPL || !defaultSetter) {
                 FunctionGenerationStrategy strategy;
                 if (defaultSetter) {
-                    if (p instanceof JetProperty && ((JetProperty) p).getDelegateExpression() != null) {
+                    if (p instanceof JetProperty && ((JetProperty) p).hasDelegate()) {
                         strategy = new DefaultPropertyWithDelegateAccessorStrategy(state, setterDescriptor);
                     }
                     else {

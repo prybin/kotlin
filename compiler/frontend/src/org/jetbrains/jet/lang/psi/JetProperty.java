@@ -207,6 +207,7 @@ public class JetProperty extends JetTypeParameterListOwnerStub<PsiJetPropertyStu
         return null;
     }
 
+    @Override
     public boolean hasInitializer() {
         PsiJetPropertyStub stub = getStub();
         if (stub != null) {

@@ -993,8 +993,7 @@ public class DescriptorResolver {
             if (!variable.hasInitializer()) {
                 if (hasDelegate && variableDescriptor instanceof PropertyDescriptor) {
                     final JetProperty property = (JetProperty) variable;
-                    final JetExpression propertyDelegateExpression = property.getDelegateExpression();
-                    if (propertyDelegateExpression != null) {
+                    if (property.hasDelegateExpression()) {
                         return DeferredType.createRecursionIntolerant(
                                 storageManager,
                                 trace,
@@ -1002,7 +1001,7 @@ public class DescriptorResolver {
                                     @Override
                                     public JetType invoke() {
                                         return resolveDelegatedPropertyType(property, (PropertyDescriptor) variableDescriptor, scope,
-                                                                            propertyDelegateExpression, dataFlowInfo, trace);
+                                                                            property.getDelegateExpression(), dataFlowInfo, trace);
                                     }
                                 });
                     }

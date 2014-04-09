@@ -168,6 +168,10 @@ public class JetProperty extends JetTypeParameterListOwnerStub<PsiJetPropertyStu
         return null;
     }
 
+    public boolean hasInitializer() {
+        return getInitializer() != null;
+    }
+
     @Override
     @Nullable
     public JetExpression getInitializer() {

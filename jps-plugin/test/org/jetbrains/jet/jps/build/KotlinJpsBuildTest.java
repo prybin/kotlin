@@ -189,6 +189,29 @@ public class KotlinJpsBuildTest extends AbstractKotlinJpsBuildTestCase {
         doTest();
     }
 
+    public void testRebuildDependentModule() {
+        doTest();
+
+        String[] packageClasses = {
+                "kt1.Kt1Package", getInternalNameForPackagePartClass(new File(workDir, "module1/src/kt1.kt"), "kt1.Kt1Package"),
+                "kt2.Kt2Package", getInternalNameForPackagePartClass(new File(workDir, "module2/src/kt2.kt"), "kt2.Kt2Package")
+        };
+
+        checkClassesDeletedFromOutputWhen(Operation.CHANGE, "module1", "module1/src/kt1.kt", packageClasses);
+    }
+
+    public void testRebuildTestsWhenSrcChanged() {
+        doTest();
+
+        String[] packageClasses = {
+                "kt1.Kt1Package", getInternalNameForPackagePartClass(new File(workDir, "src/kt1.kt"), "kt1.Kt1Package"),
+                "kt2.Kt2Package", getInternalNameForPackagePartClass(new File(workDir, "test/kt2.kt"), "kt2.Kt2Package")
+                // TODO find tests in test output dir!!
+        };
+
+        checkClassesDeletedFromOutputWhen(Operation.CHANGE, "kotlinProject", "src/kt1.kt", packageClasses);
+    }
+
     public void testCircularDependenciesWithKotlinFilesDifferentPackages() {
         initProject();
         BuildResult result = makeAll();

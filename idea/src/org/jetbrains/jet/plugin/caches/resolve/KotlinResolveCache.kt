@@ -44,11 +44,14 @@ class KotlinResolveCache(
         val project: Project,
         val resolveSession: ResolveSession
 ) {
-    private val analysisResults = CachedValuesManager.getManager(project).createCachedValue ({
-        val results = object : SLRUCache<JetElement, AnalyzeExhaust>(2, 3) {
-            override fun createValue(element: JetElement?): AnalyzeExhaust {
-                element!!
 
+    private data class Task(
+            vararg val elements: JetElement
+    )
+
+    private val analysisResults = CachedValuesManager.getManager(project).createCachedValue ({
+        val results = object : SLRUCache<Task, AnalyzeExhaust>(2, 3) {
+            override fun createValue(task: Task?): AnalyzeExhaust {
                 if (DumbService.isDumb(project)) {
                     return AnalyzeExhaust.EMPTY
                 }
@@ -56,12 +59,8 @@ class KotlinResolveCache(
                 ApplicationUtils.warnTimeConsuming(LOG)
 
                 try {
-                    if (element !is JetFile) {
-                        error("Only files are supported")
-                    }
-
                     // todo: look for pre-existing results for this element or its parents
-                    val trace = DelegatingBindingTrace(resolveSession.getBindingContext(), "Trace for resolution of " + element)
+                    val trace = DelegatingBindingTrace(resolveSession.getBindingContext(), "Trace for resolution of " + task!!.elements)
                     val injector = InjectorForTopDownAnalyzerForJvm(
                             project,
                             SimpleGlobalContext(resolveSession.getStorageManager(), resolveSession.getExceptionTracker()),
@@ -78,7 +77,7 @@ class KotlinResolveCache(
                                     analyzingBootstrapLibrary = false,
                                     declaredLocally = false
                             ),
-                            listOf(getContainingNonlocalDeclaration(element))
+                            task.elements.map { getContainingNonlocalDeclaration(it) }
                     )
                     return AnalyzeExhaust.success(
                             trace.getBindingContext(),
@@ -104,8 +103,12 @@ class KotlinResolveCache(
         CachedValueProvider.Result(results, PsiModificationTracker.MODIFICATION_COUNT, resolveSession.getExceptionTracker())
     }, false)
 
-    fun getAnalysisResultsForElement(element: JetElement): AnalyzeExhaust {
-        return analysisResults.getValue()!![element]
+    fun getAnalysisResultsForElement(elements: JetElement): AnalyzeExhaust {
+        return analysisResults.getValue()!![Task(elements)]
+    }
+
+    fun getAnalysisResultsForElements(elements: Collection<JetElement>): AnalyzeExhaust {
+        return analysisResults.getValue()!![Task(*elements.copyToArray())]
     }
 
     private fun getContainingNonlocalDeclaration(element: JetElement): JetElement? {
@@ -117,4 +120,3 @@ class KotlinResolveCache(
         LOG.error(e)
     }
 }
-

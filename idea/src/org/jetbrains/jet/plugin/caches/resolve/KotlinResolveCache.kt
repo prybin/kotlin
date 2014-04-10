@@ -37,6 +37,13 @@ import org.jetbrains.jet.lang.resolve.TopDownAnalysisParameters
 import com.intellij.openapi.progress.ProcessCanceledException
 import org.jetbrains.jet.lang.resolve.BindingTraceContext
 import com.intellij.psi.util.CachedValueProvider
+import com.intellij.openapi.vfs.VirtualFile
+import org.jetbrains.jet.asJava.LightClassUtil
+import com.intellij.openapi.roots.libraries.LibraryUtil
+import org.jetbrains.jet.lang.resolve.LibrarySourceHacks
+import org.jetbrains.jet.lang.resolve.java.AnalyzerFacadeForJVM
+import java.util.Collections
+import com.google.common.base.Predicates
 
 private val LOG = Logger.getInstance(javaClass<KotlinResolveCache>())
 
@@ -59,8 +66,18 @@ class KotlinResolveCache(
                 ApplicationUtils.warnTimeConsuming(LOG)
 
                 try {
+                    for (element in task!!.elements) {
+                        val file = element.getContainingFile() as JetFile
+                        val virtualFile = file.getVirtualFile()
+                        if (LightClassUtil.belongsToKotlinBuiltIns(file)
+                        || virtualFile != null && LibraryUtil.findLibraryEntry(virtualFile, file.getProject()) != null) {
+                            // Library sources: mark file to skip
+                            file.putUserData(LibrarySourceHacks.SKIP_TOP_LEVEL_MEMBERS, true)
+                        }
+                    }
+
                     // todo: look for pre-existing results for this element or its parents
-                    val trace = DelegatingBindingTrace(resolveSession.getBindingContext(), "Trace for resolution of " + task!!.elements)
+                    val trace = DelegatingBindingTrace(resolveSession.getBindingContext(), "Trace for resolution of " + task.elements)
                     val injector = InjectorForTopDownAnalyzerForJvm(
                             project,
                             SimpleGlobalContext(resolveSession.getStorageManager(), resolveSession.getExceptionTracker()),

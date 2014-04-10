@@ -221,7 +221,10 @@ fun elements(): List<GenericFunction> {
         body {
             """
             when (this) {
-                is List<*> -> return this[size - 1] as T
+                is List<*> -> if (size == 0)
+                        throw IllegalArgumentException("Collection is empty")
+                    else
+                        return this[size - 1] as T
                 else -> {
                     val iterator = iterator()
                     if (!iterator.hasNext())
@@ -275,21 +278,16 @@ fun elements(): List<GenericFunction> {
         returns("T")
         body {
             """
-            val iterator = iterator()
-            var last : T? = null
-            for (element in iterator) {
+            var last: T? = null
+            var found = false
+            for (element in this) {
                 if (predicate(element)) {
                     last = element
-                    break
+                    found = true
                 }
             }
-            if (last == null)
-                throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
-            for (element in iterator) {
-                if (predicate(element))
-                    last = element
-            }
-            return last!!
+            if (!found) throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
+            return last as T
             """
         }
     }
@@ -300,21 +298,13 @@ fun elements(): List<GenericFunction> {
         returns("T?")
         body {
             """
-            val iterator = iterator()
-            var last : T? = null
-            for (element in iterator) {
+            var last: T? = null
+            for (element in this) {
                 if (predicate(element)) {
                     last = element
-                    break
                 }
             }
-            if (last == null)
-                return null
-            for (element in iterator) {
-                if (predicate(element))
-                    last = element
-            }
-            return last!!
+            return last
             """
         }
     }
@@ -384,20 +374,17 @@ fun elements(): List<GenericFunction> {
         returns("T")
         body {
             """
-            var single : T? = null
+            var single: T? = null
+            var found = false
             for (element in this) {
                 if (predicate(element)) {
-                    if (single == null) {
-                        single = element
-                    } else {
-                        throw IllegalArgumentException("Collection contains more than one matching element")
-                    }
+                    if (found) throw IllegalArgumentException("Collection contains more than one matching element")
+                    single = element
+                    found = true
                 }
             }
-            if (single == null) {
-                throw IllegalArgumentException("Collection doesn't contain matching element")
-            }
-            return single!!
+            if (!found) throw IllegalArgumentException("Collection doesn't contain any element matching predicate")
+            return single as T
             """
         }
     }
@@ -408,16 +395,16 @@ fun elements(): List<GenericFunction> {
         returns("T?")
         body {
             """
-            var single : T? = null
+            var single: T? = null
+            var found = false
             for (element in this) {
                 if (predicate(element)) {
-                    if (single == null) {
-                        single = element
-                    } else {
-                        throw IllegalArgumentException("Collection contains more than one matching element")
-                    }
+                    if (found) throw IllegalArgumentException("Collection contains more than one matching element")
+                    single = element
+                    found = true
                 }
             }
+            if (!found) return null
             return single
             """
         }
